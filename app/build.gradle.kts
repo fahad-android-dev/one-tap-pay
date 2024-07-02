@@ -30,6 +30,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+        dataBinding = true
+    }
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -41,6 +46,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
+    implementation(libs.websocket)
+    implementation(libs.sdp)
+    implementation(libs.ssp)
+    implementation(libs.http)
+    implementation(libs.socket)
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
