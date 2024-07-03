@@ -147,7 +147,7 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                         if (messageContent.isNullOrEmpty()) break
 
                         println("Received WebSocket message from client $clientId: $messageContent")
-                        messageListener.onMessageReceived(message)
+                        messageListener.onMessageReceived(messageContent)
                         //addToConnectedClients(clientId)
 
                         // When client disconnects:

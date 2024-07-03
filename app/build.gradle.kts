@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.sdp)
     implementation(libs.ssp)
     implementation(libs.http)
+    implementation(libs.nearpay)
     implementation(libs.socket)
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)

@@ -13,6 +13,7 @@ websocketVersion = "1.5.2"
 sdpVersion = "1.1.0"
 http = "4.9.3"
 socketVersion = "2.0.0"
+nearpayVersion = "2.1.87"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +29,7 @@ socket = { group = "io.socket", name = "socket.io-client", version.ref = "socket
 http = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "http" }
 sdp = { group = "com.intuit.sdp", name = "sdp-android", version.ref = "sdpVersion" }
 ssp = { group = "com.intuit.ssp", name = "ssp-android", version.ref = "sdpVersion" }
+nearpay = { group = "io.nearpay", name = "nearpay-sdk-store", version.ref = "nearpayVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

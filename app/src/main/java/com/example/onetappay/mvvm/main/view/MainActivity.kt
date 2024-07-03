@@ -11,8 +11,19 @@ import com.example.onetappay.helper.TCPServer
 import com.example.onetappay.helper.WebSocketClient
 import com.example.onetappay.interfaces.MessageListener
 import com.example.onetappay.mvvm.main.adapter.ClientListAdapter
+import io.nearpay.sdk.Environments
+import io.nearpay.sdk.NearPay
+import io.nearpay.sdk.utils.PaymentText
+import io.nearpay.sdk.utils.enums.AuthenticationData
+import io.nearpay.sdk.utils.enums.NetworkConfiguration
+import io.nearpay.sdk.utils.enums.PurchaseFailure
+import io.nearpay.sdk.utils.enums.TransactionData
+import io.nearpay.sdk.utils.enums.UIPosition
+import io.nearpay.sdk.utils.listeners.PurchaseListener
 import java.io.OutputStream
 import java.net.Socket
+import java.util.Locale
+import java.util.UUID
 
 class MainActivity : AppCompatActivity(), MessageListener {
     private lateinit var tcpServer: TCPServer
@@ -22,6 +33,7 @@ class MainActivity : AppCompatActivity(), MessageListener {
     private lateinit var socket : Socket
     private var adapter = ClientListAdapter()
     private  var arrListClients = ArrayList<String>()
+    private lateinit var nearpay : NearPay
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,20 +41,16 @@ class MainActivity : AppCompatActivity(), MessageListener {
         binding.rvClients.adapter = adapter
 
         initializeSocket()
+        initializeNearPay()
 
     }
 
     private fun initializeSocket(){
-        // Initialize and start TCP server
         tcpServer = TCPServer(8085,this)
         Thread {
             tcpServer.start()
         }.start()
 
-
-
-
-        // Initialize and start WebSocket server
         webSocketClient = WebSocketClient(8085)
         webSocketClient.start()
 
@@ -54,14 +62,24 @@ class MainActivity : AppCompatActivity(), MessageListener {
          }*/
     }
 
+    private fun initializeNearPay(){
+        nearpay = NearPay.Builder()
+            .context(this)
+            .authenticationData(AuthenticationData.UserEnter)
+            .environment(Environments.SANDBOX)
+            .locale(Locale.getDefault())
+            .networkConfiguration(NetworkConfiguration.SIM_PREFERRED)
+            .uiPosition(UIPosition.CENTER_BOTTOM)
+            .paymentText(PaymentText("يرجى تمرير الطاقة", "please tap your card"))
+            .loadingUi(true)
+            .build()
+    }
+
     private fun updateClientList(clients: List<String>) {
         runOnUiThread {
             adapter.updateClients(clients)
         }
     }
-
-
-
 
     override fun onDestroy() {
         super.onDestroy()
@@ -73,7 +91,7 @@ class MainActivity : AppCompatActivity(), MessageListener {
     override fun onMessageReceived(message: String) {
         runOnUiThread {
             println("Received message in activity: $message")
-            //tcpServer.handleMessage(message)
+            callPurchase(message)
         }
     }
 
@@ -94,9 +112,45 @@ class MainActivity : AppCompatActivity(), MessageListener {
                 }
                 println("Connected to server")
             } catch (e: Exception) {
+
                 e.printStackTrace()
             }
         }.start()
+    }
+
+    private fun callPurchase(amount:String){
+        val customerReferenceNumber = "9ace70b7-977d-4094-b7f4-4ecb17de6753"
+        val enableReceiptUi = true
+        val enableReversal = true
+        val finishTimeOut : Long = 10
+        val requestId = UUID.randomUUID()
+        val enableUiDismiss = true
+
+        nearpay.purchase(amount.toLong(), customerReferenceNumber, enableReceiptUi, enableReversal, finishTimeOut, requestId, enableUiDismiss, object :
+            PurchaseListener {
+
+            override fun onPurchaseApproved(transactionData: TransactionData) {}
+
+            override fun onPurchaseFailed(purchaseFailure: PurchaseFailure) {
+                when (purchaseFailure) {
+                    is PurchaseFailure.PurchaseDeclined -> {
+
+                    }
+
+                    is PurchaseFailure.PurchaseRejected -> {}
+
+                    is PurchaseFailure.AuthenticationFailed -> {
+                        nearpay.updateAuthentication(AuthenticationData.Jwt("JWT HERE"))
+                    }
+
+                    is PurchaseFailure.InvalidStatus -> {}
+
+                    is PurchaseFailure.GeneralFailure -> {}
+
+                    is PurchaseFailure.UserCancelled -> {}
+                }
+            }
+        })
     }
 
 }
