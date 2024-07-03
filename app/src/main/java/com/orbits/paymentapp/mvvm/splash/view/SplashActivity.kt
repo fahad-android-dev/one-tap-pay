@@ -1,4 +1,4 @@
-package com.example.onetappay.mvvm.splash.view
+package com.orbits.paymentapp.mvvm.splash.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
-import com.example.onetappay.R
-import com.example.onetappay.databinding.ActivitySplashBinding
-import com.example.onetappay.mvvm.main.view.MainActivity
+import com.orbits.paymentapp.R
+import com.orbits.paymentapp.databinding.ActivitySplashBinding
+import com.orbits.paymentapp.mvvm.main.view.MainActivity
 
 class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding

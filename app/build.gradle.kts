@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.onetappay"
+    namespace = "com.orbits.paymentapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.onetappay"
+        applicationId = "com.orbits.paymentapp"
         minSdk = 25
         targetSdk = 34
         versionCode = 1

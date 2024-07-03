@@ -1,4 +1,4 @@
-package com.example.onetappay.interfaces
+package com.orbits.paymentapp.interfaces
 
 import java.net.Socket
 

@@ -1,4 +1,4 @@
-package com.example.onetappay
+package com.orbits.paymentapp
 
 import org.junit.Test
 

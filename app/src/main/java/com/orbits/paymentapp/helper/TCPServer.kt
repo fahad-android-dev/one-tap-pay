@@ -1,10 +1,10 @@
-package com.example.onetappay.helper
+package com.orbits.paymentapp.helper
 
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.onetappay.interfaces.MessageListener
+import com.orbits.paymentapp.interfaces.MessageListener
 import java.io.*
 import java.net.ServerSocket
 import java.net.Socket

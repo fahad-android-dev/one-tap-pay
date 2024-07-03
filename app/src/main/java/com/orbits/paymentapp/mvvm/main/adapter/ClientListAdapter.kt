@@ -1,13 +1,13 @@
-package com.example.onetappay.mvvm.main.adapter
+package com.orbits.paymentapp.mvvm.main.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.onetappay.R
-import com.example.onetappay.databinding.LvItemClientListBinding
-import com.example.onetappay.interfaces.CommonInterfaceClickEvent
+import com.orbits.paymentapp.R
+import com.orbits.paymentapp.databinding.LvItemClientListBinding
+import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
 
 class ClientListAdapter(): RecyclerView.Adapter<ClientListAdapter.MyViewHolder>() {
 

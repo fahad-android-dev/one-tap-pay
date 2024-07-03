@@ -1,4 +1,4 @@
-package com.example.onetappay.interfaces
+package com.orbits.paymentapp.interfaces
 
 interface CommonInterfaceClickEvent {
     fun onItemClick(type: String, position: Int) {}

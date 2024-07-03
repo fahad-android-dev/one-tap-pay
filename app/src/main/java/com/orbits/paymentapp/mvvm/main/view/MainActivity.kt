@@ -1,16 +1,16 @@
-package com.example.onetappay.mvvm.main.view
+package com.orbits.paymentapp.mvvm.main.view
 
 import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.example.onetappay.R
-import com.example.onetappay.databinding.ActivityMainBinding
-import com.example.onetappay.helper.TCPServer
-import com.example.onetappay.helper.WebSocketClient
-import com.example.onetappay.interfaces.MessageListener
-import com.example.onetappay.mvvm.main.adapter.ClientListAdapter
+import com.orbits.paymentapp.R
+import com.orbits.paymentapp.databinding.ActivityMainBinding
+import com.orbits.paymentapp.helper.TCPServer
+import com.orbits.paymentapp.helper.WebSocketClient
+import com.orbits.paymentapp.interfaces.MessageListener
+import com.orbits.paymentapp.mvvm.main.adapter.ClientListAdapter
 import io.nearpay.sdk.Environments
 import io.nearpay.sdk.NearPay
 import io.nearpay.sdk.utils.PaymentText
@@ -65,10 +65,10 @@ class MainActivity : AppCompatActivity(), MessageListener {
     private fun initializeNearPay(){
         nearpay = NearPay.Builder()
             .context(this)
-            .authenticationData(AuthenticationData.UserEnter)
+            .authenticationData(AuthenticationData.Email("development@aflak.com.sa"))
             .environment(Environments.SANDBOX)
             .locale(Locale.getDefault())
-            .networkConfiguration(NetworkConfiguration.SIM_PREFERRED)
+            .networkConfiguration(NetworkConfiguration.DEFAULT)
             .uiPosition(UIPosition.CENTER_BOTTOM)
             .paymentText(PaymentText("يرجى تمرير الطاقة", "please tap your card"))
             .loadingUi(true)
