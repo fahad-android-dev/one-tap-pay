@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity(), MessageListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        binding.rvClients.adapter = adapter
+       // binding.rvClients.adapter = adapter
 
         initializeSocket()
         initializeNearPay()

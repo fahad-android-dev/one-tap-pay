@@ -151,7 +151,7 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                         //addToConnectedClients(clientId)
 
                         // When client disconnects:
-                        handleMessage(message)
+                      //  handleMessage(message)
                         /*connectedClientsList.value?.let {
                             sendMessageBetweenClients(connectedClientsList.value?.get(0) ?: "",
                                 it, messageContent ?: "")
@@ -165,7 +165,7 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                     var message: String?
                     while (inStream?.readLine().also { message = it } != null) {
                         println("Received from TCP client $clientId: $message")
-                        handleMessage(message ?: "")
+                      //  handleMessage(message ?: "")
                         outStream?.flush()
 
                         // Handle TCP message here as needed
