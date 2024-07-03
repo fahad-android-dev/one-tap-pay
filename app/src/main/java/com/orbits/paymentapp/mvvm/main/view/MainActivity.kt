@@ -7,8 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.orbits.paymentapp.R
 import com.orbits.paymentapp.databinding.ActivityMainBinding
+import com.orbits.paymentapp.helper.AlertDialogInterface
+import com.orbits.paymentapp.helper.BaseActivity
+import com.orbits.paymentapp.helper.Constants
+import com.orbits.paymentapp.helper.Dialogs
 import com.orbits.paymentapp.helper.TCPServer
 import com.orbits.paymentapp.helper.WebSocketClient
+import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
 import com.orbits.paymentapp.interfaces.MessageListener
 import com.orbits.paymentapp.mvvm.main.adapter.ClientListAdapter
 import io.nearpay.sdk.Environments
@@ -25,7 +30,7 @@ import java.net.Socket
 import java.util.Locale
 import java.util.UUID
 
-class MainActivity : AppCompatActivity(), MessageListener {
+class MainActivity : BaseActivity(), MessageListener {
     private lateinit var tcpServer: TCPServer
     private lateinit var webSocketClient: WebSocketClient
     private lateinit var binding: ActivityMainBinding
@@ -42,7 +47,28 @@ class MainActivity : AppCompatActivity(), MessageListener {
 
         initializeSocket()
         initializeNearPay()
+        initializeToolbar()
 
+    }
+
+    private fun initializeToolbar(){
+        setUpToolbar(
+            binding.layoutToolbar,
+            title = getString(R.string.app_name),
+            isBackArrow = false,
+            toolbarClickListener = object : CommonInterfaceClickEvent{
+                override fun onToolBarListener(type: String) {
+                    if (type == Constants.TOOLBAR_ICON_ONE){
+                        Dialogs.showPasswordDialog(
+                            activity = this@MainActivity,
+                            alertDialogInterface = object : AlertDialogInterface{
+
+                            }
+                        )
+                    }
+                }
+            }
+        )
     }
 
     private fun initializeSocket(){

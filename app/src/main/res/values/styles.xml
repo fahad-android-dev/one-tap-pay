@@ -64,7 +64,7 @@
 
     <!--Button Styles-->
 
-   <!-- <style name="CommonButtonStyle">
+    <style name="CommonButtonStyle">
         <item name="android:background">@drawable/btn_bg</item>
         <item name="android:layout_height">@dimen/btn_size</item>
         <item name="android:textColor">@color/txt_color_white</item>
@@ -74,10 +74,10 @@
         <item name="android:textAlignment">center</item>
         <item name="android:textSize">@dimen/btn_text_size</item>
         <item name="android:paddingBottom">@dimen/_1sdp</item>
-    </style>-->
+    </style>
 
 
-  <!--  <style name="CommonInputEditTextStyle" parent="@android:style/TextAppearance">
+    <style name="CommonInputEditTextStyle" parent="@android:style/TextAppearance">
         <item name="android:textSize">@dimen/edtTextSize</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/edt_height</item>
@@ -97,7 +97,7 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:fontFamily">@font/font_regular</item>
         <item name="android:inputType">text</item>
-    </style>-->
+    </style>
 
     <!--use when edit text with image -->
     <!--edittext view which has arrow, so arrow means its not typeable. it will act as drop down-->
