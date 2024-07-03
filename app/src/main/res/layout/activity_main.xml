@@ -4,64 +4,48 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <import type="android.view.View"/>
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/rootLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".mvvm.main.view.MainActivity">
+        android:layout_height="match_parent">
 
-
-
-
-        <androidx.core.widget.NestedScrollView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true">
+            tools:context=".mvvm.home.view.HomeActivity">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <fragment
+                android:id="@+id/nav_host_fragment"
+                android:name="androidx.navigation.fragment.NavHostFragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <include
-                    android:id="@+id/layoutToolbar"
-                    layout="@layout/layout_toolbar"/>
-
-                <ImageView
-                    android:layout_width="@dimen/_200sdp"
-                    android:layout_height="@dimen/_200sdp"
-                    android:layout_centerInParent="true"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:scaleType="fitCenter"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:src="@drawable/ic_splash" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvClients"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:orientation="vertical"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:visibility="gone"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:itemCount="6"
-                    android:layout_marginHorizontal="@dimen/_12sdp"
-                    tools:listitem="@layout/lv_item_client_list" />
+                android:layout_height="0dp"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/nav_graph"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="FragmentTagUsage" />
 
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigationView"
+            android:layout_width="@dimen/_240sdp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:layout_marginEnd="@dimen/_40sdp"
+            android:fitsSystemWindows="true"
+            android:theme="@style/NavigationDrawerText"
+            app:itemBackground="@color/app_bg_color"
+            app:itemIconPadding="@dimen/_10sdp"
+            app:itemTextAppearance="@style/fontRegular">
 
-        </androidx.core.widget.NestedScrollView>
+        </com.google.android.material.navigation.NavigationView>
+    </androidx.drawerlayout.widget.DrawerLayout>
 
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

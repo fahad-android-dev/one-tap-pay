@@ -5,13 +5,17 @@ import android.location.Location
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.orbits.paymentapp.databinding.LayoutToolbarBinding
+import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
 import com.orbits.paymentapp.mvvm.main.view.MainActivity
 
 open class BaseFragment : Fragment() {
     private var progressDialog: Dialog? = null
     var onRequestPermissionsResult: OnRequestPermissionsResult? = null
     var hasInitializedRootView = false
+    private var layoutToolbarBinding: LayoutToolbarBinding? = null
     private lateinit var mActivity: MainActivity
 
     private var rootView: View? = null
@@ -47,6 +51,37 @@ open class BaseFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mActivity = activity as MainActivity
+    }
+
+    fun setUpToolbar(
+        binding: LayoutToolbarBinding,
+        title: String = "",
+        iconTwo: Int = 0,
+        isBackArrow: Boolean = true,
+        toolbarClickListener: CommonInterfaceClickEvent? = null
+    ) {
+        layoutToolbarBinding = binding
+
+        /*if (isBackArrow) layoutToolbarBinding?.conIconOne?.visibility = isVisibleInvisible(iconOne != 0)
+        else layoutToolbarBinding?.conIconOne?.isVisible = iconOne != 0*/
+
+
+        layoutToolbarBinding?.conIconTwo?.isVisible = iconTwo != 0
+        if (layoutToolbarBinding?.conIconTwo?.isVisible == true)
+            layoutToolbarBinding?.ivIconTwo?.setImageResource(iconTwo)
+
+        layoutToolbarBinding?.linBackArrow?.isVisible = isBackArrow
+        layoutToolbarBinding?.linBackArrow?.setOnClickListener {
+
+        }
+        layoutToolbarBinding?.conIconOne?.setOnClickListener {
+            toolbarClickListener?.onToolBarListener(Constants.TOOLBAR_ICON_ONE)
+        }
+
+        layoutToolbarBinding?.conIconTwo?.setOnClickListener {
+            toolbarClickListener?.onToolBarListener(Constants.TOOLBAR_ICON_TWO)
+        }
+        layoutToolbarBinding?.txtToolbarHeader?.text = title
     }
 
 
