@@ -14,13 +14,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import com.orbits.paymentapp.R
+import com.orbits.paymentapp.databinding.LayoutGenerateCodeDialogBinding
 import com.orbits.paymentapp.databinding.LayoutSettingsPasswordDialogBinding
 import com.orbits.paymentapp.helper.Global.getDimension
 
 object Dialogs {
 
     var customDialog: Dialog? = null
-
+    var codeDialog: Dialog? = null
 
     fun showPasswordDialog(
         activity: Context,
@@ -70,6 +71,40 @@ object Dialogs {
                 }
             }
             customDialog?.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun showCodeDialog(
+        activity: Context,
+        isCancellable: Boolean? = true,
+        alertDialogInterface: AlertDialogInterface,
+    ) {
+        try {
+            codeDialog = Dialog(activity)
+            codeDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            codeDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            val binding: LayoutGenerateCodeDialogBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(activity),
+                R.layout.layout_generate_code_dialog, null, false
+            )
+            codeDialog?.setContentView(binding.root)
+            val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
+            lp.copyFrom(codeDialog?.window?.attributes)
+            lp.width = getDimension(activity as Activity, 300.00)
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+            lp.gravity = Gravity.CENTER
+            codeDialog?.window?.attributes = lp
+            codeDialog?.setCanceledOnTouchOutside(isCancellable ?: true)
+            codeDialog?.setCancelable(isCancellable ?: true)
+
+
+
+            binding.btnAlertPositive.setOnClickListener {
+
+            }
+            codeDialog?.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }

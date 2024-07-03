@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.nearpay)
     implementation(libs.socket)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.otp)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -14,6 +14,7 @@ sdpVersion = "1.1.0"
 http = "4.9.3"
 socketVersion = "2.0.0"
 nearpayVersion = "2.1.87"
+otp = "1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -30,6 +31,7 @@ http = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "http" }
 sdp = { group = "com.intuit.sdp", name = "sdp-android", version.ref = "sdpVersion" }
 ssp = { group = "com.intuit.ssp", name = "ssp-android", version.ref = "sdpVersion" }
 nearpay = { group = "io.nearpay", name = "nearpay-sdk-store", version.ref = "nearpayVersion" }
+otp = { group = "com.github.appsfeature", name = "otp-view", version.ref = "otp"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

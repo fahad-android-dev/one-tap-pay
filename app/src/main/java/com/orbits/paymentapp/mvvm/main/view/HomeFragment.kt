@@ -85,7 +85,14 @@ class HomeFragment : BaseFragment(), MessageListener {
                             activity = mActivity,
                             alertDialogInterface = object : AlertDialogInterface {
                                 override fun onYesClick() {
-                                    findNavController().navigate(R.id.action_to_navigation_settings)
+                                    Dialogs.showCodeDialog(
+                                        activity = mActivity,
+                                        alertDialogInterface = object : AlertDialogInterface {
+                                            override fun onYesClick() {
+
+                                            }
+                                        }
+                                    )
                                 }
                             }
                         )
