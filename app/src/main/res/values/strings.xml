@@ -165,5 +165,7 @@
     <string name="label_lets_get_started">Let\'s get started</string>
     <string name="label_search_your_department">Search Your Department</string>
     <string name="label_enter_pin">Enter Pin</string>
+    <string name="label_generate">Generate</string>
+    <string name="label_regenerate">Regenerate</string>
 
 </resources>

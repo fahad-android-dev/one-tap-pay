@@ -10,6 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         tools:context=".mvvm.home.view.HomeFragment">
 
         <include
@@ -38,7 +39,7 @@
                     android:layout_marginHorizontal="@dimen/screen_margin"
                     android:layout_marginTop="@dimen/_20sdp"
                     android:layout_marginBottom="@dimen/_10sdp"
-                    android:text="Generate Connection Code"
+                    android:text="Pairing Code"
                     android:textSize="@dimen/medium_text_size"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

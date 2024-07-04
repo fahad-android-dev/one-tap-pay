@@ -8,12 +8,14 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import com.orbits.paymentapp.R
-import com.orbits.paymentapp.databinding.FragmentHomeBinding
 import com.orbits.paymentapp.databinding.FragmentSettingsBinding
 import com.orbits.paymentapp.helper.AlertDialogInterface
 import com.orbits.paymentapp.helper.BaseFragment
 import com.orbits.paymentapp.helper.Constants
 import com.orbits.paymentapp.helper.Dialogs
+import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
+import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
+import com.orbits.paymentapp.helper.helper_model.UserResponseModel
 import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
 import com.orbits.paymentapp.mvvm.main.view.MainActivity
 
@@ -51,6 +53,7 @@ class SettingsFragment : BaseFragment() {
     private fun initializeToolbar(){
         setUpToolbar(
             binding.layoutToolbar,
+            title = "Settings",
             isBackArrow = true,
             navController = findNavController(),
             toolbarClickListener = object : CommonInterfaceClickEvent {
@@ -67,13 +70,34 @@ class SettingsFragment : BaseFragment() {
         binding.txtGenerateCode.setOnClickListener {
             Dialogs.showCodeDialog(
                 activity = mActivity,
+                code = activity?.getUserDataResponse()?.code ?: "",
                 alertDialogInterface = object : AlertDialogInterface {
                     override fun onYesClick() {
-
+                        Dialogs.showCustomAlert(
+                            activity = mActivity,
+                            msg = "Are you sure you want to generate new code?",
+                            yesBtn = "Yes",
+                            noBtn = "No",
+                            alertDialogInterface = object : AlertDialogInterface{
+                                override fun onYesClick() {
+                                    activity?.setUserDataResponse(
+                                        UserResponseModel(
+                                            code = generateRandomCode()
+                                        )
+                                    )
+                                }
+                            }
+                        )
                     }
                 }
             )
         }
+    }
+
+    private fun generateRandomCode(): String {
+        val random = java.util.Random()
+        val randomCode = random.nextInt(10000)
+        return String.format("%04d", randomCode)
     }
 
 }

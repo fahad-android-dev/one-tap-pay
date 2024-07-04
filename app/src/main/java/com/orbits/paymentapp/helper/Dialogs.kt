@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.orbits.paymentapp.R
+import com.orbits.paymentapp.databinding.LayoutCustomAlertBinding
 import com.orbits.paymentapp.databinding.LayoutGenerateCodeDialogBinding
 import com.orbits.paymentapp.databinding.LayoutSettingsPasswordDialogBinding
 import com.orbits.paymentapp.helper.Global.getDimension
@@ -83,6 +84,7 @@ object Dialogs {
 
     fun showCodeDialog(
         activity: Context,
+        code : String ?= "",
         isCancellable: Boolean? = true,
         alertDialogInterface: AlertDialogInterface,
     ) {
@@ -105,17 +107,18 @@ object Dialogs {
             codeDialog?.setCancelable(isCancellable ?: true)
 
 
-            binding.otpView.setOTP(activity.getUserDataResponse()?.code ?: "")
-            println("here is code ${activity.getUserDataResponse()?.code ?: ""}")
+            binding.otpView.setOTP(code ?: "")
+
+            if (code?.isEmpty() == true){
+                binding.btnAlertPositive.text = activity.getString(R.string.label_generate)
+            }else{
+                binding.btnAlertPositive.text = activity.getString(R.string.label_regenerate)
+            }
 
             binding.btnAlertPositive.setOnClickListener {
-                activity.setUserDataResponse(
-                    UserResponseModel(
-                        code = generateRandomCode()
-                    )
-                )
-
-                binding.otpView.setOTP(activity.getUserDataResponse()?.code ?: "")
+                alertDialogInterface.onYesClick()
+                binding.otpView.setOTP(code ?: "")
+                codeDialog?.dismiss()
             }
             codeDialog?.show()
         } catch (e: Exception) {
@@ -123,9 +126,54 @@ object Dialogs {
         }
     }
 
-    private fun generateRandomCode(): String {
-        val random = java.util.Random()
-        val randomCode = random.nextInt(10000)
-        return String.format("%04d", randomCode)
+    fun showCustomAlert(
+        activity: Context,
+        title: String = "",
+        msg: String = "",
+        yesBtn: String,
+        noBtn: String,
+        singleBtn: Boolean = false,
+        isCancellable: Boolean? = true,
+        alertDialogInterface: AlertDialogInterface,
+    ) {
+        try {
+            customDialog = Dialog(activity)
+            customDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            customDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            val binding: LayoutCustomAlertBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(activity),
+                R.layout.layout_custom_alert, null, false
+            )
+            customDialog?.setContentView(binding.root)
+            val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
+            lp.copyFrom(customDialog?.window?.attributes)
+            lp.width = getDimension(activity as Activity, 300.00)
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+            lp.gravity = Gravity.CENTER
+            customDialog?.window?.attributes = lp
+            customDialog?.setCanceledOnTouchOutside(isCancellable ?: true)
+            customDialog?.setCancelable(isCancellable ?: true)
+
+
+            binding.txtAlertTitle.text = title
+            binding.txtAlertMessage.text = msg
+            binding.btnAlertNegative.text = noBtn
+            binding.btnAlertPositive.text = yesBtn
+
+            binding.btnAlertNegative.visibility = if (singleBtn) View.GONE else View.VISIBLE
+            binding.btnAlertNegative.setOnClickListener {
+                customDialog?.dismiss()
+                alertDialogInterface.onNoClick()
+            }
+            binding.btnAlertPositive.setOnClickListener {
+                customDialog?.dismiss()
+                alertDialogInterface.onYesClick()
+            }
+            customDialog?.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
+
+
 }
