@@ -7,11 +7,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.method.PasswordTransformationMethod
 import android.view.*
-import android.widget.TextView
 import android.widget.Toast
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import com.orbits.paymentapp.R
 import com.orbits.paymentapp.databinding.LayoutGenerateCodeDialogBinding
@@ -65,7 +62,10 @@ object Dialogs {
                     Toast.makeText(activity,"Please enter pin", Toast.LENGTH_SHORT).show()
                 }else if (binding.edtPassword.text.length < 4){
                     Toast.makeText(activity,"Pin length should be at least 4 digits", Toast.LENGTH_SHORT).show()
-                } else{
+                }else if (binding.edtPassword.text.toString() != "1234"){
+                    Toast.makeText(activity,"Invalid Pin", Toast.LENGTH_SHORT).show()
+                }
+                else{
                     customDialog?.dismiss()
                     alertDialogInterface.onYesClick()
                 }
@@ -79,6 +79,7 @@ object Dialogs {
     fun showCodeDialog(
         activity: Context,
         isCancellable: Boolean? = true,
+        savedCode:String,
         alertDialogInterface: AlertDialogInterface,
     ) {
         try {
@@ -100,13 +101,20 @@ object Dialogs {
             codeDialog?.setCancelable(isCancellable ?: true)
 
 
+            binding.otpView.setOTP(savedCode)
 
             binding.btnAlertPositive.setOnClickListener {
-
+                binding.otpView.setOTP(generateRandomCode())
             }
             codeDialog?.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun generateRandomCode(): String {
+        val random = java.util.Random()
+        val randomCode = random.nextInt(10000)
+        return String.format("%04d", randomCode)
     }
 }

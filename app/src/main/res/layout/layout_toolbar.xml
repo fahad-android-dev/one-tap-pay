@@ -36,12 +36,13 @@
 
                 <ImageView
                     android:id="@+id/ivArrow"
-                    android:layout_width="@dimen/_13sdp"
-                    android:layout_height="@dimen/_16sdp"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
                     android:layout_marginEnd="@dimen/_5sdp"
                     android:clickable="false"
                     android:focusable="false"
-                    android:rotation="180"
+                    android:rotation="90"
+                    android:src="@drawable/ic_down_arror"
                     app:tint="@color/color_black"
                     tools:ignore="ContentDescription" />
 

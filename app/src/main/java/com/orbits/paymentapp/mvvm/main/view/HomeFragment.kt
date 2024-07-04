@@ -78,6 +78,7 @@ class HomeFragment : BaseFragment(), MessageListener {
             binding.layoutToolbar,
             title = getString(R.string.app_name),
             isBackArrow = false,
+            navController = findNavController(),
             toolbarClickListener = object : CommonInterfaceClickEvent {
                 override fun onToolBarListener(type: String) {
                     if (type == Constants.TOOLBAR_ICON_ONE){
@@ -85,14 +86,7 @@ class HomeFragment : BaseFragment(), MessageListener {
                             activity = mActivity,
                             alertDialogInterface = object : AlertDialogInterface {
                                 override fun onYesClick() {
-                                    Dialogs.showCodeDialog(
-                                        activity = mActivity,
-                                        alertDialogInterface = object : AlertDialogInterface {
-                                            override fun onYesClick() {
-
-                                            }
-                                        }
-                                    )
+                                    findNavController().navigate(R.id.action_to_navigation_settings)
                                 }
                             }
                         )

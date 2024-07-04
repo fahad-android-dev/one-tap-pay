@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import com.orbits.paymentapp.databinding.LayoutToolbarBinding
 import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
 import com.orbits.paymentapp.mvvm.main.view.MainActivity
@@ -57,14 +58,13 @@ open class BaseFragment : Fragment() {
         binding: LayoutToolbarBinding,
         title: String = "",
         iconTwo: Int = 0,
-        isBackArrow: Boolean = true,
+        navController: NavController,
+        isBackArrow: Boolean = false,
         toolbarClickListener: CommonInterfaceClickEvent? = null
     ) {
         layoutToolbarBinding = binding
 
-        /*if (isBackArrow) layoutToolbarBinding?.conIconOne?.visibility = isVisibleInvisible(iconOne != 0)
-        else layoutToolbarBinding?.conIconOne?.isVisible = iconOne != 0*/
-
+        if (isBackArrow)  layoutToolbarBinding?.conIconOne?.isVisible = false
 
         layoutToolbarBinding?.conIconTwo?.isVisible = iconTwo != 0
         if (layoutToolbarBinding?.conIconTwo?.isVisible == true)
@@ -72,6 +72,7 @@ open class BaseFragment : Fragment() {
 
         layoutToolbarBinding?.linBackArrow?.isVisible = isBackArrow
         layoutToolbarBinding?.linBackArrow?.setOnClickListener {
+            navController.popBackStack()
 
         }
         layoutToolbarBinding?.conIconOne?.setOnClickListener {
