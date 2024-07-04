@@ -17,6 +17,7 @@ nearpayVersion = "2.1.87"
 otp = "1.1"
 datastoreVersion = "1.0.0"
 gsonVersion = "2.9.1"
+otpVersion = "v1.1.2-ktx"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,7 @@ otp = { group = "com.github.appsfeature", name = "otp-view", version.ref = "otp"
 datastorePref = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastoreVersion"}
 datastore = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreVersion"}
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gsonVersion"}
+newOtp = { group = "com.github.aabhasr1", name = "OtpView", version.ref = "otpVersion"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

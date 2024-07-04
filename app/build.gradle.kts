@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.socket)
     implementation(libs.datastore)
     implementation(libs.gson)
+    implementation(libs.newOtp)
     implementation(libs.datastorePref)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.otp)

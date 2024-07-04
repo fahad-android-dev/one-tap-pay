@@ -34,12 +34,6 @@ object PrefUtils {
         }
     }
 
-    fun Context.saveConnectionCode(code: String) {
-        val userData = getUserDataResponse()
-        userData?.data?.connection_code = code
-        setUserDataResponse(userData)
-    }
-
     fun Context.getUserId(): String {
         return getUserDataResponse()?.data?.id.asString()
     }
@@ -51,6 +45,9 @@ object PrefUtils {
 
     fun Context.isUserLoggedIn(): Boolean {
         return this.getUserDataResponse()?.data?.id != null
+    }
+    fun Context.isCodeVerified(): Boolean {
+        return this.getUserDataResponse()?.data?.isCodeVerified != false
     }
 
     fun Context.getDeviceModel(): Device {

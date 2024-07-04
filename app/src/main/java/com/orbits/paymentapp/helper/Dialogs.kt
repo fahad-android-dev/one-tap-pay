@@ -15,11 +15,6 @@ import com.orbits.paymentapp.databinding.LayoutCustomAlertBinding
 import com.orbits.paymentapp.databinding.LayoutGenerateCodeDialogBinding
 import com.orbits.paymentapp.databinding.LayoutSettingsPasswordDialogBinding
 import com.orbits.paymentapp.helper.Global.getDimension
-import com.orbits.paymentapp.helper.PrefUtils.getConnectionCode
-import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
-import com.orbits.paymentapp.helper.PrefUtils.saveConnectionCode
-import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
-import com.orbits.paymentapp.helper.helper_model.UserResponseModel
 
 object Dialogs {
 
@@ -106,8 +101,9 @@ object Dialogs {
             codeDialog?.setCanceledOnTouchOutside(isCancellable ?: true)
             codeDialog?.setCancelable(isCancellable ?: true)
 
+            println("herer is code 111 $code")
 
-            binding.otpView.setOTP(code ?: "")
+            binding.txtCode.text = addSpacesBetweenLetters(code ?: "")
 
             if (code?.isEmpty() == true){
                 binding.btnAlertPositive.text = activity.getString(R.string.label_generate)
@@ -117,7 +113,7 @@ object Dialogs {
 
             binding.btnAlertPositive.setOnClickListener {
                 alertDialogInterface.onYesClick()
-                binding.otpView.setOTP(code ?: "")
+                binding.txtCode.text = addSpacesBetweenLetters(code ?: "")
                 codeDialog?.dismiss()
             }
             codeDialog?.show()
@@ -173,6 +169,11 @@ object Dialogs {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun addSpacesBetweenLetters(input: String): String {
+        // Convert the string to a list of characters, join them with spaces, and convert back to string
+        return input.toCharArray().joinToString("   ")
     }
 
 

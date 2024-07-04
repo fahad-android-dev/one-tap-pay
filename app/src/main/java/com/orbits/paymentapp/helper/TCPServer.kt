@@ -4,6 +4,9 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.JsonSyntaxException
 import com.orbits.paymentapp.interfaces.MessageListener
 import java.io.*
 import java.net.ServerSocket
@@ -142,22 +145,21 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
 
                     while (true) {
                         val message = readWebSocketFrame(clientSocket?.getInputStream() ?: return)
-                        val recipientClientId = message?.substringBefore(":")?.trim()
-                        val messageContent = message?.substringAfter(":")?.trim()
-                        if (messageContent.isNullOrEmpty()) break
+                        if (message.isNullOrEmpty()) break
 
-                        println("Received WebSocket message from client $clientId: $messageContent")
-                        messageListener.onMessageReceived(messageContent)
-                        //addToConnectedClients(clientId)
+                        println("Received WebSocket message from client $clientId: $message")
 
-                        // When client disconnects:
-                      //  handleMessage(message)
-                        /*connectedClientsList.value?.let {
-                            sendMessageBetweenClients(connectedClientsList.value?.get(0) ?: "",
-                                it, messageContent ?: "")
-                        }*/
+                        try {
+                            println("Received WebSocket jsonObject from client $clientId: $message")
+                            val jsonObject = Gson().fromJson(message, JsonObject::class.java)
+                            messageListener.onMessageJsonReceived(jsonObject)
+                        } catch (e: JsonSyntaxException) {
+                            println("Invalid JSON format received from client $clientId: $message")
+                            inStream?.close()
+                            outStream?.close()
+                            clientSocket.close()
+                        }
 
-                       // outStream?.write(encodeWebSocketFrame(message))
                          outStream?.flush()
                     }
                 } else {
@@ -165,7 +167,16 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                     var message: String?
                     while (inStream?.readLine().also { message = it } != null) {
                         println("Received from TCP client $clientId: $message")
-                      //  handleMessage(message ?: "")
+                        try {
+                            println("Received WebSocket jsonObject from client $clientId: $message")
+                            val jsonObject = Gson().fromJson(message, JsonObject::class.java)
+                            messageListener.onMessageJsonReceived(jsonObject)
+                        } catch (e: JsonSyntaxException) {
+                            println("Invalid JSON format received from client $clientId: $message")
+                            inStream?.close()
+                            outStream?.close()
+                            clientSocket?.close()
+                        }
                         outStream?.flush()
 
                         // Handle TCP message here as needed
@@ -181,6 +192,7 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                     clients.remove(clientId)
                     removeFromConnectedClients(clientId)
                     println("Client disconnected: $clientId")
+                    messageListener.onClientDisconnected()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
