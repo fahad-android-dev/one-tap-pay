@@ -204,6 +204,7 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
             try {
                 val request = readHttpRequest()
                 val webSocketKey = extractWebSocketKey(request)
+                println("herer")
                 if (webSocketKey.isNotEmpty()) {
                     val acceptKey = generateWebSocketAcceptKey(webSocketKey)
                     val response = buildHandshakeResponse(acceptKey)
