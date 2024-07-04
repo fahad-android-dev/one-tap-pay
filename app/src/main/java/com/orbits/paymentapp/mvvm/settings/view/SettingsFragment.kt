@@ -67,7 +67,6 @@ class SettingsFragment : BaseFragment() {
         binding.txtGenerateCode.setOnClickListener {
             Dialogs.showCodeDialog(
                 activity = mActivity,
-                savedCode = "1234",
                 alertDialogInterface = object : AlertDialogInterface {
                     override fun onYesClick() {
 

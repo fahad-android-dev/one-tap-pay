@@ -14,6 +14,11 @@ import com.orbits.paymentapp.R
 import com.orbits.paymentapp.databinding.LayoutGenerateCodeDialogBinding
 import com.orbits.paymentapp.databinding.LayoutSettingsPasswordDialogBinding
 import com.orbits.paymentapp.helper.Global.getDimension
+import com.orbits.paymentapp.helper.PrefUtils.getConnectionCode
+import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
+import com.orbits.paymentapp.helper.PrefUtils.saveConnectionCode
+import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
+import com.orbits.paymentapp.helper.helper_model.UserResponseModel
 
 object Dialogs {
 
@@ -79,7 +84,6 @@ object Dialogs {
     fun showCodeDialog(
         activity: Context,
         isCancellable: Boolean? = true,
-        savedCode:String,
         alertDialogInterface: AlertDialogInterface,
     ) {
         try {
@@ -101,10 +105,17 @@ object Dialogs {
             codeDialog?.setCancelable(isCancellable ?: true)
 
 
-            binding.otpView.setOTP(savedCode)
+            binding.otpView.setOTP(activity.getUserDataResponse()?.code ?: "")
+            println("here is code ${activity.getUserDataResponse()?.code ?: ""}")
 
             binding.btnAlertPositive.setOnClickListener {
-                binding.otpView.setOTP(generateRandomCode())
+                activity.setUserDataResponse(
+                    UserResponseModel(
+                        code = generateRandomCode()
+                    )
+                )
+
+                binding.otpView.setOTP(activity.getUserDataResponse()?.code ?: "")
             }
             codeDialog?.show()
         } catch (e: Exception) {
