@@ -29,6 +29,7 @@ import com.orbits.paymentapp.helper.helper_model.UserResponseModel
 import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
 import com.orbits.paymentapp.interfaces.MessageListener
 import com.orbits.paymentapp.mvvm.main.adapter.ClientListAdapter
+import com.orbits.paymentapp.mvvm.main.model.ClientDataModel
 import io.nearpay.sdk.Environments
 import io.nearpay.sdk.NearPay
 import io.nearpay.sdk.utils.PaymentText
@@ -54,6 +55,7 @@ class HomeFragment : BaseFragment(), MessageListener {
     private var adapter = ClientListAdapter()
     private  var arrListClients = ArrayList<String>()
     private lateinit var nearpay : NearPay
+    private var clientModel = ClientDataModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,11 +160,24 @@ class HomeFragment : BaseFragment(), MessageListener {
         mActivity.runOnUiThread {
             if (!json.isJsonNull){
                 println("Received json in activity: $json")
-                val code = json.get("code").asString
-                val amount = json.get("amount").asString
+
+                clientModel = ClientDataModel(
+
+                    code = json.get("code")?.asString ?: "",
+                    amount = json.get("amount")?.asString ?: "",
+                    client_id = json.get("client_id")?.asString ?: "",
+                    transaction_id = json.get("transaction_id")?.asString ?: "",
+                    time = json.get("time")?.asString ?: "",
+                    desc = json.get("desc")?.asString ?: "",
+                    currency = json.get("currency")?.asString ?: "",
+                    transaction_type = json.get("transaction_type")?.asString ?: "",
+                )
+
+                val code = clientModel.code
+                val amount = clientModel.amount
 
                 if (mActivity.isCodeVerified()){
-                    if (code.isEmpty()){
+                    if (code?.isEmpty() == true){
                         callPurchase(amount.asDouble())
                     }
                 }else {

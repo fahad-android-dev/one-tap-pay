@@ -113,6 +113,25 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
         return counter++.toString()
     }
 
+    fun sendMessageToClient(recipientClientId: String, message: String) {
+        Thread {
+            synchronized(clients) {
+                val recipientClientHandler = clients[recipientClientId]
+                if (recipientClientHandler != null) {
+                    try {
+                        recipientClientHandler.outStream?.write(message.toByteArray())
+                        recipientClientHandler.outStream?.flush()
+                        println("Sent message to client $recipientClientId: $message")
+                    } catch(e: Exception) {
+                        println("Error sending message to client $recipientClientId: ${e.message}")
+                    }
+                } else {
+                    println("Recipient client $recipientClientId not found or not connected.")
+                }
+            }
+        }.start()
+    }
+
 
     /*------------------------------------------------All Functions-----------------------------------------------------------------*/
 
@@ -153,6 +172,12 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                             println("Received WebSocket jsonObject from client $clientId: $message")
                             val jsonObject = Gson().fromJson(message, JsonObject::class.java)
                             messageListener.onMessageJsonReceived(jsonObject)
+                            if (!jsonObject.isJsonNull){
+                                if (jsonObject.get("amount").asString.isNotEmpty()){
+                                    handleMessage(clientId,"Payment Initiated")
+                                }
+                            }
+
                         } catch (e: JsonSyntaxException) {
                             println("Invalid JSON format received from client $clientId: $message")
                             inStream?.close()
@@ -204,7 +229,6 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
             try {
                 val request = readHttpRequest()
                 val webSocketKey = extractWebSocketKey(request)
-                println("herer")
                 if (webSocketKey.isNotEmpty()) {
                     val acceptKey = generateWebSocketAcceptKey(webSocketKey)
                     val response = buildHandshakeResponse(acceptKey)
@@ -251,11 +275,8 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                 """.trimIndent() + "\r\n\r\n"
         }
 
-        fun handleMessage(message: String) {
-            // Assume message format: "recipientClientId:messageContent"
-            val recipientClientId = message.substringBefore(":").trim()
-            val messageContent = message.substringAfter(":").trim()
-            sendMessageToClient(recipientClientId, messageContent)
+        fun handleMessage(clientId: String,message: String) {
+            sendMessageToClient(clientId, message)
         }
 
         fun sendMessageToClient(clientId: String?, message: String) {
