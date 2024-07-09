@@ -8,6 +8,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.orbits.paymentapp.interfaces.MessageListener
+import com.orbits.paymentapp.interfaces.MessageSender
+import io.nearpay.sdk.utils.enums.TransactionData
 import java.io.*
 import java.net.ServerSocket
 import java.net.Socket
@@ -84,43 +86,37 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
         }
     }
 
-    fun sendMessageBetweenClients(senderClientId: String, recipientClientIds: List<String>, message: String) {
-        Thread {
-            synchronized(clients) {
-                val senderClientHandler = clients[senderClientId]
-
-                if (senderClientHandler != null) {
-                    for (recipientClientId in recipientClientIds) {
-                        val recipientClientHandler = clients[recipientClientId]
-                        if (recipientClientHandler != null) {
-                            recipientClientHandler.sendMessageToClient(recipientClientId,message)
-                        } else {
-                            println("Recipient client $recipientClientId not found or not connected.")
-                            // Optionally handle this scenario (e.g., notify sender)
-                        }
-                    }
-                } else {
-                    println("Sender client $senderClientId not found or not connected.")
-                    // Optionally handle this scenario (e.g., notify sender)
-                }
-            }
-        }.start()
-    }
-
     var counter = 1
 
     fun generateCustomId(): String {
         return counter++.toString()
     }
 
-    fun sendMessageToClient(recipientClientId: String, message: String) {
+    fun sendMessageToClient(recipientClientId: String, message: TransactionData) {
+        Thread {
+            synchronized(clients) {
+                val recipientClientHandler = clients[recipientClientId]
+                if (recipientClientHandler != null) {
+                    try {
+                        recipientClientHandler.outStream?.write(message.toString().toByteArray())
+                        println("Sent message to client $recipientClientId: $message")
+                    } catch(e: Exception) {
+                        println("Error sending message to client $recipientClientId: ${e.message}")
+                    }
+                } else {
+                    println("Recipient client $recipientClientId not found or not connected.")
+                }
+            }
+        }.start()
+    }
+
+    fun sendMessageToClientString(recipientClientId: String, message: String) {
         Thread {
             synchronized(clients) {
                 val recipientClientHandler = clients[recipientClientId]
                 if (recipientClientHandler != null) {
                     try {
                         recipientClientHandler.outStream?.write(message.toByteArray())
-                        recipientClientHandler.outStream?.flush()
                         println("Sent message to client $recipientClientId: $message")
                     } catch(e: Exception) {
                         println("Error sending message to client $recipientClientId: ${e.message}")
@@ -139,14 +135,15 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
     //----------------------------------------------------------------------//----------------------------------------------------------------------------//
 
 
-    private inner class ClientHandler(val clientSocket: Socket?) : Runnable {
+    inner class ClientHandler(val clientSocket: Socket?) : Runnable {
         private var inStream: BufferedReader? = null
         var outStream: OutputStream? = null
-        private var isWebSocket = false
+        var isWebSocket = false
         val clientId = generateCustomId() // Generate a unique client identifier
 
         init {
             try {
+                WebSocketManager.addClientHandler(clientId, this)
                 inStream = BufferedReader(InputStreamReader(clientSocket?.getInputStream()))
                 outStream = clientSocket?.getOutputStream()
             } catch (e: Exception) {
@@ -172,11 +169,12 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                             println("Received WebSocket jsonObject from client $clientId: $message")
                             val jsonObject = Gson().fromJson(message, JsonObject::class.java)
                             messageListener.onMessageJsonReceived(jsonObject)
-                            if (!jsonObject.isJsonNull){
+
+                            /*if (!jsonObject.isJsonNull){
                                 if (jsonObject.get("amount").asString.isNotEmpty()){
                                     handleMessage(clientId,"Payment Initiated")
                                 }
-                            }
+                            }*/
 
                         } catch (e: JsonSyntaxException) {
                             println("Invalid JSON format received from client $clientId: $message")
@@ -371,6 +369,22 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
             }
 
             return String(payload, Charsets.UTF_8)
+        }
+    }
+
+    object WebSocketManager {
+        private val clientHandlers: MutableMap<String, ClientHandler> = mutableMapOf()
+
+        fun addClientHandler(clientId: String, clientHandler: ClientHandler) {
+            clientHandlers[clientId] = clientHandler
+        }
+
+        fun getClientHandler(clientId: String): ClientHandler? {
+            return clientHandlers[clientId]
+        }
+
+        fun removeClientHandler(clientId: String) {
+            clientHandlers.remove(clientId)
         }
     }
 }

@@ -28,17 +28,18 @@
                     layout="@layout/layout_toolbar" />
 
                 <ImageView
+                    android:id="@+id/ivMain"
                     android:layout_width="@dimen/_200sdp"
                     android:layout_height="@dimen/_200sdp"
                     android:layout_centerInParent="true"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_splash"
+                    android:src="@drawable/ic_app_logo"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <androidx.recyclerview.widget.RecyclerView
+                <!--<androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvClients"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -52,7 +53,21 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:itemCount="6"
-                    tools:listitem="@layout/lv_item_client_list" />
+                    tools:listitem="@layout/lv_item_client_list" />-->
+
+                <TextView
+                    android:id="@+id/txtMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/_13ssp"
+                    android:textColor="@color/color_black"
+                    android:gravity="start"
+                    android:textAlignment="viewStart"
+                    android:layout_marginHorizontal="@dimen/_12sdp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    app:layout_constraintTop_toBottomOf="@+id/ivMain"
+                    app:layout_constraintStart_toStartOf="parent" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>

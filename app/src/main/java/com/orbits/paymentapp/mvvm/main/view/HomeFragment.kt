@@ -1,8 +1,8 @@
 package com.orbits.paymentapp.mvvm.main.view
 
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +10,9 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.orbits.paymentapp.R
-import com.orbits.paymentapp.databinding.ActivityMainBinding
 import com.orbits.paymentapp.databinding.FragmentHomeBinding
 import com.orbits.paymentapp.helper.AlertDialogInterface
 import com.orbits.paymentapp.helper.BaseFragment
@@ -30,6 +30,7 @@ import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
 import com.orbits.paymentapp.interfaces.MessageListener
 import com.orbits.paymentapp.mvvm.main.adapter.ClientListAdapter
 import com.orbits.paymentapp.mvvm.main.model.ClientDataModel
+import com.orbits.paymentapp.mvvm.main.model.SuccessPurchaseDataModel
 import io.nearpay.sdk.Environments
 import io.nearpay.sdk.NearPay
 import io.nearpay.sdk.utils.PaymentText
@@ -38,6 +39,7 @@ import io.nearpay.sdk.utils.enums.NetworkConfiguration
 import io.nearpay.sdk.utils.enums.PurchaseFailure
 import io.nearpay.sdk.utils.enums.TransactionData
 import io.nearpay.sdk.utils.enums.UIPosition
+import io.nearpay.sdk.utils.listeners.BitmapListener
 import io.nearpay.sdk.utils.listeners.PurchaseListener
 import java.io.OutputStream
 import java.net.Socket
@@ -56,6 +58,7 @@ class HomeFragment : BaseFragment(), MessageListener {
     private  var arrListClients = ArrayList<String>()
     private lateinit var nearpay : NearPay
     private var clientModel = ClientDataModel()
+    val gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -245,32 +248,84 @@ class HomeFragment : BaseFragment(), MessageListener {
         val finishTimeOut : Long = 10
         val requestId = UUID.randomUUID()
         val enableUiDismiss = true
+        val nearpayAmount = (amount * 100).toLong()
 
-        nearpay.purchase(amount.toLong(), customerReferenceNumber, enableReceiptUi, enableReversal, finishTimeOut, requestId, enableUiDismiss, object :
+        nearpay.purchase(nearpayAmount, customerReferenceNumber, enableReceiptUi, enableReversal, finishTimeOut, requestId, enableUiDismiss, object :
             PurchaseListener {
 
-            override fun onPurchaseApproved(transactionData: TransactionData) {}
+            override fun onPurchaseApproved(transactionData: TransactionData) {
+
+                val jsonObject = JsonObject()
+                jsonObject.add("transactionData", gson.toJsonTree(transactionData))
+                arrListClients.forEachIndexed { index, it ->
+                    if (index == arrListClients.size - 1) {
+                        sendMessageToWebSocketClient(it, jsonObject)
+                    }
+                }
+            }
+
 
             override fun onPurchaseFailed(purchaseFailure: PurchaseFailure) {
                 when (purchaseFailure) {
                     is PurchaseFailure.PurchaseDeclined -> {
+                        println("here is 1111")
+                        val jsonObject = JsonObject()
+                        jsonObject.add("transactionData", gson.toJsonTree(purchaseFailure.transactionData))
+                        arrListClients.forEachIndexed { index, it ->
+                            if (index == arrListClients.size - 1) {
+                                sendMessageToWebSocketClient(it, jsonObject)
+                            }
+                        }
 
                     }
 
-                    is PurchaseFailure.PurchaseRejected -> {}
+                    is PurchaseFailure.PurchaseRejected -> {
+
+                        println("here is 222")
+                        arrListClients.forEachIndexed { index, it ->
+                            if (index == arrListClients.size - 1) {
+                                val jsonObject = JsonObject()
+                                jsonObject.addProperty("status_message","failure")
+                                jsonObject.addProperty("description", purchaseFailure.message)
+                                sendMessageToWebSocketClient(it,jsonObject)
+                            }
+                        }
+                    }
 
                     is PurchaseFailure.AuthenticationFailed -> {
+                        println("here is 333")
                         nearpay.updateAuthentication(AuthenticationData.Jwt("JWT HERE"))
                     }
 
-                    is PurchaseFailure.InvalidStatus -> {}
+                    is PurchaseFailure.InvalidStatus -> {
+                        println("here is 4444")
+                    }
 
-                    is PurchaseFailure.GeneralFailure -> {}
+                    is PurchaseFailure.GeneralFailure -> {
+                        println("here is 555")
+                    }
 
-                    is PurchaseFailure.UserCancelled -> {}
+                    is PurchaseFailure.UserCancelled -> {
+                        println("here is 6666")
+                    }
                 }
             }
         })
+
+    }
+
+
+    private fun sendMessageToWebSocketClient(clientId: String, jsonObject: JsonObject) {
+        val clientHandler = TCPServer.WebSocketManager.getClientHandler(clientId)
+        if (clientHandler != null && clientHandler.isWebSocket) {
+            Thread{
+                val jsonMessage = gson.toJson(jsonObject)
+                clientHandler.sendMessageToClient(clientId, jsonMessage)
+            }.start()
+            // Optionally handle success or error
+        } else {
+            // Handle case where clientHandler is not found or not a WebSocket client
+        }
     }
 
 }
