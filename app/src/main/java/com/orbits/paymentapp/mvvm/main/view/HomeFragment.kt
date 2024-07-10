@@ -226,10 +226,10 @@ class HomeFragment : BaseFragment(), MessageListener {
                     socket = clientSocket
                     mActivity.runOnUiThread {
                         tcpServer.observeClientList().observe(this) { clients ->
-                            println("here is client list ${clients}")
+                            println("here is client start 3333 ${clients}")
+                            println("here is client start 3333 ${clients.size}")
                             arrListClients.addAll(clients)
 
-                            updateClientList(clients)
                         }
                     }
                 }
@@ -242,6 +242,8 @@ class HomeFragment : BaseFragment(), MessageListener {
     }
 
     private fun callPurchase(amount: Double){
+        println("here is client start 0000 ${arrListClients.size}")
+
         val customerReferenceNumber = "9ace70b7-977d-4094-b7f4-4ecb17de6753"
         val enableReceiptUi = true
         val enableReversal = true
@@ -254,13 +256,11 @@ class HomeFragment : BaseFragment(), MessageListener {
             PurchaseListener {
 
             override fun onPurchaseApproved(transactionData: TransactionData) {
-
                 val jsonObject = JsonObject()
+                println("here is transaction data $transactionData")
                 jsonObject.add("transactionData", gson.toJsonTree(transactionData))
-                arrListClients.forEachIndexed { index, it ->
-                    if (index == arrListClients.size - 1) {
-                        sendMessageToWebSocketClient(it, jsonObject)
-                    }
+                arrListClients.forEach {
+                    sendMessageToWebSocketClient(it, jsonObject)
                 }
             }
 
@@ -269,12 +269,11 @@ class HomeFragment : BaseFragment(), MessageListener {
                 when (purchaseFailure) {
                     is PurchaseFailure.PurchaseDeclined -> {
                         println("here is 1111")
+                        println("here is ${purchaseFailure.transactionData}")
                         val jsonObject = JsonObject()
                         jsonObject.add("transactionData", gson.toJsonTree(purchaseFailure.transactionData))
-                        arrListClients.forEachIndexed { index, it ->
-                            if (index == arrListClients.size - 1) {
-                                sendMessageToWebSocketClient(it, jsonObject)
-                            }
+                        arrListClients.forEach {
+                            sendMessageToWebSocketClient(it, jsonObject)
                         }
 
                     }
@@ -282,31 +281,55 @@ class HomeFragment : BaseFragment(), MessageListener {
                     is PurchaseFailure.PurchaseRejected -> {
 
                         println("here is 222")
-                        arrListClients.forEachIndexed { index, it ->
-                            if (index == arrListClients.size - 1) {
-                                val jsonObject = JsonObject()
-                                jsonObject.addProperty("status_message","failure")
-                                jsonObject.addProperty("description", purchaseFailure.message)
-                                sendMessageToWebSocketClient(it,jsonObject)
-                            }
+                        arrListClients.forEach {
+                            println("here is ${purchaseFailure.message}")
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("status_message","failure")
+                            jsonObject.addProperty("description", purchaseFailure.message)
+                            println("here is purchase rejected")
+                            sendMessageToWebSocketClient(it,jsonObject)
                         }
                     }
 
                     is PurchaseFailure.AuthenticationFailed -> {
+
+                        println("here is client start 2222 ${arrListClients.size}")
                         println("here is 333")
+                        println("here is ${purchaseFailure.message}")
+                        println("here is client list ${arrListClients.size}")
+                        println("here is client list 111 $arrListClients")
                         nearpay.updateAuthentication(AuthenticationData.Jwt("JWT HERE"))
+                        arrListClients.forEach {
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("status_message","failure")
+                            println("here is purchase rejected ${jsonObject}")
+                            sendMessageToWebSocketClient(it,jsonObject)
+                        }
                     }
 
                     is PurchaseFailure.InvalidStatus -> {
                         println("here is 4444")
+                        arrListClients.forEach {
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("status_message","failure")
+                            sendMessageToWebSocketClient(it,jsonObject)
+                        }
                     }
 
                     is PurchaseFailure.GeneralFailure -> {
-                        println("here is 555")
+                        arrListClients.forEach {
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("status_message","failure")
+                            sendMessageToWebSocketClient(it,jsonObject)
+                        }
                     }
 
                     is PurchaseFailure.UserCancelled -> {
-                        println("here is 6666")
+                        arrListClients.forEach {
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("status_message","failure")
+                            sendMessageToWebSocketClient(it,jsonObject)
+                        }
                     }
                 }
             }

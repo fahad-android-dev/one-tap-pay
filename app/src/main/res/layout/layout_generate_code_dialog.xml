@@ -37,12 +37,22 @@
                     android:paddingBottom="@dimen/_15sdp"
                     android:orientation="vertical">
 
+                    <ImageView
+                        android:id="@+id/ivCancel"
+                        android:layout_width="@dimen/_12sdp"
+                        android:layout_height="@dimen/_12sdp"
+                        android:layout_marginEnd="@dimen/_10sdp"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/ic_cross"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
                     <TextView
                         android:id="@+id/txtMessage"
                         android:layout_width="match_parent"
                         style="@style/TextStyleCenterMedium"
                         android:layout_gravity="center"
-                        android:layout_marginTop="@dimen/_20sdp"
+                        android:layout_marginTop="@dimen/_25sdp"
                         android:textSize="@dimen/biggest_text_size"
                         android:layout_marginHorizontal="@dimen/screen_margin"
                         android:text="Pairing Code"

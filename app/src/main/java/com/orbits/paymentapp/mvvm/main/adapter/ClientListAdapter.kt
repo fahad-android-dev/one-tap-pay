@@ -53,7 +53,6 @@ class ClientListAdapter(): RecyclerView.Adapter<ClientListAdapter.MyViewHolder>(
     }
 
     fun updateClients(newClients: List<String>) {
-        arrClientList.clear()
         arrClientList.addAll(newClients)
         notifyDataSetChanged()
     }

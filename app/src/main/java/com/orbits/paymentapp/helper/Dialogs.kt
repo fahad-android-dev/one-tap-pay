@@ -58,6 +58,10 @@ object Dialogs {
                 }
             }
 
+            binding.ivCancel.setOnClickListener {
+                customDialog?.dismiss()
+            }
+
             binding.btnAlertPositive.setOnClickListener {
                 if (binding.edtPassword.text.isEmpty()){
                     Toast.makeText(activity,"Please enter pin", Toast.LENGTH_SHORT).show()
@@ -109,6 +113,10 @@ object Dialogs {
                 binding.btnAlertPositive.text = activity.getString(R.string.label_generate)
             }else{
                 binding.btnAlertPositive.text = activity.getString(R.string.label_regenerate)
+            }
+
+            binding.ivCancel.setOnClickListener {
+                codeDialog?.dismiss()
             }
 
             binding.btnAlertPositive.setOnClickListener {

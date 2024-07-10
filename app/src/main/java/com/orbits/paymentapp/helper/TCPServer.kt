@@ -43,11 +43,13 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                 // Handle client connection on a new thread
                 if (!clients.containsKey(clientHandler.clientId)) {
                     clients[clientHandler.clientId] = clientHandler
-                    messageListener.onClientConnected(clientSocket)
                     Thread(clientHandler).start()
+                    addToConnectedClients(clientHandler.clientId)
+                    messageListener.onClientConnected(clientSocket)
+
 
                     // Add client to connectedClientsList
-                    addToConnectedClients(clientHandler.clientId)
+
                 } else {
                     println("Client ${clientHandler.clientId} is already connected.")
                     // Optionally, you can notify or handle this scenario accordingly
