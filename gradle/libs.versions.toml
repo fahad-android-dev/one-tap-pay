@@ -18,6 +18,7 @@ otp = "1.1"
 datastoreVersion = "1.0.0"
 gsonVersion = "2.9.1"
 otpVersion = "v1.1.2-ktx"
+snackbarVersion = "1.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,6 +40,7 @@ datastorePref = { group = "androidx.datastore", name = "datastore-preferences", 
 datastore = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreVersion"}
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gsonVersion"}
 newOtp = { group = "com.github.aabhasr1", name = "OtpView", version.ref = "otpVersion"}
+snackbar = { group = "com.github.egek92", name = "ProteinBar", version.ref = "snackbarVersion"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

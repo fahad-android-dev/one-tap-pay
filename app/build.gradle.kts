@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.http)
     implementation(libs.nearpay)
     implementation(libs.socket)
+    implementation(libs.snackbar)
     implementation(libs.datastore)
     implementation(libs.gson)
     implementation(libs.newOtp)

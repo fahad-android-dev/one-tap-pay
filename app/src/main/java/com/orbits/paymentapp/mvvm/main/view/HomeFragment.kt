@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
@@ -19,6 +18,7 @@ import com.orbits.paymentapp.helper.BaseFragment
 import com.orbits.paymentapp.helper.Constants
 import com.orbits.paymentapp.helper.Dialogs
 import com.orbits.paymentapp.helper.Extensions.asDouble
+import com.orbits.paymentapp.helper.Global.showSnackBar
 import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
 import com.orbits.paymentapp.helper.PrefUtils.isCodeVerified
 import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
@@ -185,7 +185,7 @@ class HomeFragment : BaseFragment(), MessageListener {
                     }
                 }else {
                     if (code == mActivity.getUserDataResponse()?.code){
-                        Toast.makeText(mActivity,"Client Connected",Toast.LENGTH_SHORT).show()
+                        binding.root.showSnackBar("Client Connected")
                         mActivity.setUserDataResponse(
                             UserResponseModel(
                                 code = mActivity.getUserDataResponse()?.code,
@@ -196,12 +196,12 @@ class HomeFragment : BaseFragment(), MessageListener {
                         )
                     }else{
                         socket.close()
-                        Toast.makeText(mActivity,"Client Disconnected",Toast.LENGTH_SHORT).show()
+                        binding.root.showSnackBar("Client Disconnected")
                     }
                 }
             }else {
                 socket.close()
-                Toast.makeText(mActivity,"Client Disconnected",Toast.LENGTH_SHORT).show()
+                binding.root.showSnackBar("Client Disconnected")
             }
 
         }
@@ -226,8 +226,7 @@ class HomeFragment : BaseFragment(), MessageListener {
                     socket = clientSocket
                     mActivity.runOnUiThread {
                         tcpServer.observeClientList().observe(this) { clients ->
-                            println("here is client start 3333 ${clients}")
-                            println("here is client start 3333 ${clients.size}")
+                            binding.root.showSnackBar("Client Connected")
                             arrListClients.addAll(clients)
 
                         }
