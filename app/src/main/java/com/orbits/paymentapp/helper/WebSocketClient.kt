@@ -17,7 +17,7 @@ class WebSocketClient(port: Int) : WebSocketServer(InetSocketAddress(port)) {
     override fun onMessage(conn: WebSocket?, message: String?) {
         println("Received message from WebSocket client: $message")
         // Example: echo back the message
-        conn?.send("Echo: $message")
+        conn?.send(message)
     }
 
     override fun onError(conn: WebSocket?, ex: Exception?) {

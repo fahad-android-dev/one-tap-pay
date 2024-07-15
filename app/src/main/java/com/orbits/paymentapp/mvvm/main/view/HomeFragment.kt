@@ -181,6 +181,11 @@ class HomeFragment : BaseFragment(), MessageListener {
 
                 if (mActivity.isCodeVerified()){
                     if (code?.isEmpty() == true){
+                        arrListClients.forEach {
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("message","success")
+                            sendMessageToWebSocketClient(it,jsonObject)
+                        }
                         callPurchase(amount.asDouble())
                     }
                 }else {
@@ -291,12 +296,6 @@ class HomeFragment : BaseFragment(), MessageListener {
                     }
 
                     is PurchaseFailure.AuthenticationFailed -> {
-
-                        println("here is client start 2222 ${arrListClients.size}")
-                        println("here is 333")
-                        println("here is ${purchaseFailure.message}")
-                        println("here is client list ${arrListClients.size}")
-                        println("here is client list 111 $arrListClients")
                         nearpay.updateAuthentication(AuthenticationData.Jwt("JWT HERE"))
                         arrListClients.forEach {
                             val jsonObject = JsonObject()
