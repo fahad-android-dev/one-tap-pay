@@ -14,12 +14,24 @@
         android:id="@+id/navigation_settings"
         android:name="com.orbits.paymentapp.mvvm.settings.view.SettingsFragment"
         tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/reconcileFragment"
+        android:name="com.orbits.paymentapp.mvvm.settings.view.ReconcileFragment"
+        tools:layout="@layout/fragment_reconcile" />
+
     <action
         android:id="@+id/action_to_navigation_settings"
         app:destination="@id/navigation_settings"
         app:enterAnim="@anim/slide_in_right"
         app:exitAnim="@anim/slide_out_right"
-        app:popExitAnim="@anim/slide_out_right"
-        />
+        app:popExitAnim="@anim/slide_out_right" />
+
+    <action
+        android:id="@+id/action_settingsFragment_to_reconcileFragment"
+        app:destination="@id/reconcileFragment"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/slide_out_right"
+        app:popExitAnim="@anim/slide_out_right" />
 
 </navigation>

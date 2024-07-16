@@ -28,7 +28,6 @@ class SettingsFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mActivity = activity as MainActivity
-
     }
 
     override fun onCreateView(
@@ -48,11 +47,10 @@ class SettingsFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initializeToolbar()
-        onClickListeners()
-
+        setupClickListeners()
     }
 
-    private fun initializeToolbar(){
+    private fun initializeToolbar() {
         setUpToolbar(
             binding.layoutToolbar,
             title = "Settings",
@@ -60,58 +58,67 @@ class SettingsFragment : BaseFragment() {
             navController = findNavController(),
             toolbarClickListener = object : CommonInterfaceClickEvent {
                 override fun onToolBarListener(type: String) {
-                    if (type == Constants.TOOLBAR_ICON_ONE){
-
-                    }
+                    // Handle toolbar icon click if needed
                 }
             }
         )
     }
 
-    private fun onClickListeners(){
+    private fun setupClickListeners() {
         binding.txtGenerateCode.setOnClickListener {
-            Dialogs.showCodeDialog(
-                activity = mActivity,
-                code = activity?.getUserDataResponse()?.code ?: "",
-                alertDialogInterface = object : AlertDialogInterface {
-                    override fun onYesClick() {
-                        Dialogs.showCustomAlert(
-                            activity = mActivity,
-                            msg = "Are you sure you want to generate new code?",
-                            yesBtn = "Yes",
-                            noBtn = "No",
-                            alertDialogInterface = object : AlertDialogInterface{
-                                override fun onYesClick() {
-                                    mActivity.setUserDataResponse(
-                                        UserResponseModel(
-                                            code = mActivity.getUserDataResponse()?.code,
-                                            data = UserDataModel(
-                                                isCodeVerified = false
-                                            )
-                                        )
-                                    )
+            showGenerateCodeDialog()
+        }
 
-                                    activity?.setUserDataResponse(
-                                        UserResponseModel(
-                                            code = generateRandomCode()
-                                        )
-                                    )
-                                }
-                            }
-                        )
-                    }
-                }
-            )
+        binding.txtReconcile.setOnClickListener {
+            navigateToReconcileFragment()
         }
     }
 
-    fun generateRandomCode(): String {
-        val charPool : List<Char> = ('A'..'Z') + ('0'..'9')
+    private fun showGenerateCodeDialog() {
+        Dialogs.showCodeDialog(
+            activity = mActivity,
+            code = activity?.getUserDataResponse()?.code ?: "",
+            alertDialogInterface = object : AlertDialogInterface {
+                override fun onYesClick() {
+                    Dialogs.showCustomAlert(
+                        activity = mActivity,
+                        msg = "Are you sure you want to generate a new code?",
+                        yesBtn = "Yes",
+                        noBtn = "No",
+                        alertDialogInterface = object : AlertDialogInterface {
+                            override fun onYesClick() {
+                                mActivity.setUserDataResponse(
+                                    UserResponseModel(
+                                        code = mActivity.getUserDataResponse()?.code,
+                                        data = UserDataModel(
+                                            isCodeVerified = false
+                                        )
+                                    )
+                                )
+
+                                activity?.setUserDataResponse(
+                                    UserResponseModel(
+                                        code = generateRandomCode()
+                                    )
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+        )
+    }
+
+    private fun navigateToReconcileFragment() {
+        findNavController().navigate(R.id.action_settingsFragment_to_reconcileFragment)
+    }
+
+    private fun generateRandomCode(): String {
+        val charPool: List<Char> = ('A'..'Z') + ('0'..'9')
 
         return (1..6)
             .map { Random.nextInt(0, charPool.size) }
             .map(charPool::get)
             .joinToString("")
     }
-
 }
