@@ -19,6 +19,8 @@ datastoreVersion = "1.0.0"
 gsonVersion = "2.9.1"
 otpVersion = "v1.1.2-ktx"
 snackbarVersion = "1.4"
+coilVersion = "2.4.0"
+zxingVersion = "3.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +43,10 @@ datastore = { group = "androidx.datastore", name = "datastore-core", version.ref
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gsonVersion"}
 newOtp = { group = "com.github.aabhasr1", name = "OtpView", version.ref = "otpVersion"}
 snackbar = { group = "com.github.egek92", name = "ProteinBar", version.ref = "snackbarVersion"}
+coilKtx = { group = "io.coil-kt", name = "coil", version.ref = "coilVersion"}
+coilGif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coilVersion"}
+coilBase = { group = "io.coil-kt", name = "coil-base", version.ref = "coilVersion"}
+zxing = { group = "com.google.zxing", name = "core", version.ref = "zxingVersion"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

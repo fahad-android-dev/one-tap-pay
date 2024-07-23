@@ -1,7 +1,12 @@
 package com.orbits.paymentapp.mvvm.main.view
 
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
+import androidx.core.app.NotificationCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
@@ -9,9 +14,11 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import com.orbits.paymentapp.R
 import com.orbits.paymentapp.databinding.ActivityMainBinding
+import com.orbits.paymentapp.helper.AppController
 import com.orbits.paymentapp.helper.BaseActivity
+import com.orbits.paymentapp.interfaces.MessageListener
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(){
 
     lateinit var binding: ActivityMainBinding
     private var isBackPressed: Long = 0
@@ -80,10 +87,6 @@ class MainActivity : BaseActivity() {
         } else {
             navController.popBackStack()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     private fun toolbarInit(title: String){

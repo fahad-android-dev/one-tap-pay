@@ -1,6 +1,8 @@
 package com.orbits.paymentapp.helper
 
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,14 +10,16 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.orbits.paymentapp.interfaces.MessageListener
-import com.orbits.paymentapp.interfaces.MessageSender
 import io.nearpay.sdk.utils.enums.TransactionData
-import java.io.*
+import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.OutputStream
 import java.net.ServerSocket
 import java.net.Socket
 import java.security.MessageDigest
-import java.util.*
-import kotlin.collections.HashMap
+import java.util.Base64
 import kotlin.experimental.xor
 
 class TCPServer(private val port: Int, private val messageListener: MessageListener) {
@@ -23,12 +27,14 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
     private var serverSocket: ServerSocket? = null
     private val clients = HashMap<String, ClientHandler>()
     private val connectedClientsList = MutableLiveData<List<String>>()
+    var arrListClients = ArrayList<String>()
 
     init {
         connectedClientsList.value = emptyList()
     }
 
     fun observeClientList(): LiveData<List<String>> {
+        println("here is Client List 000 ${connectedClientsList.value}")
         return connectedClientsList
     }
 
@@ -45,8 +51,6 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                     clients[clientHandler.clientId] = clientHandler
                     Thread(clientHandler).start()
                     addToConnectedClients(clientHandler.clientId)
-                    messageListener.onClientConnected(clientSocket)
-
 
                     // Add client to connectedClientsList
 
@@ -76,7 +80,16 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
             currentList.add(clientId)
             println("here is list 1111 $currentList")
             connectedClientsList.postValue(currentList)
+            arrListClients.clear()
+            arrListClients.addAll(currentList)
+            println("here is list new 111 ${arrListClients}")
         }
+    }
+
+    fun handler(delay: Long, block: () -> Unit) {
+        Handler(Looper.getMainLooper()).postDelayed({
+            block()
+        }, delay)
     }
 
     private fun removeFromConnectedClients(clientId: String) {
@@ -171,6 +184,7 @@ class TCPServer(private val port: Int, private val messageListener: MessageListe
                             println("Received WebSocket jsonObject from client $clientId: $message")
                             val jsonObject = Gson().fromJson(message, JsonObject::class.java)
                             messageListener.onMessageJsonReceived(jsonObject)
+                            messageListener.onClientConnected(clientSocket,arrListClients)
 
                             /*if (!jsonObject.isJsonNull){
                                 if (jsonObject.get("amount").asString.isNotEmpty()){

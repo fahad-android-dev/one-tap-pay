@@ -1,12 +1,15 @@
 package com.orbits.paymentapp.mvvm.main.view
 
-import android.graphics.Bitmap
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
@@ -22,6 +25,7 @@ import com.orbits.paymentapp.helper.Global.showSnackBar
 import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
 import com.orbits.paymentapp.helper.PrefUtils.isCodeVerified
 import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
+import com.orbits.paymentapp.helper.ServerService
 import com.orbits.paymentapp.helper.TCPServer
 import com.orbits.paymentapp.helper.WebSocketClient
 import com.orbits.paymentapp.helper.helper_model.UserDataModel
@@ -30,7 +34,6 @@ import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
 import com.orbits.paymentapp.interfaces.MessageListener
 import com.orbits.paymentapp.mvvm.main.adapter.ClientListAdapter
 import com.orbits.paymentapp.mvvm.main.model.ClientDataModel
-import com.orbits.paymentapp.mvvm.main.model.SuccessPurchaseDataModel
 import io.nearpay.sdk.Environments
 import io.nearpay.sdk.NearPay
 import io.nearpay.sdk.utils.PaymentText
@@ -39,7 +42,6 @@ import io.nearpay.sdk.utils.enums.NetworkConfiguration
 import io.nearpay.sdk.utils.enums.PurchaseFailure
 import io.nearpay.sdk.utils.enums.TransactionData
 import io.nearpay.sdk.utils.enums.UIPosition
-import io.nearpay.sdk.utils.listeners.BitmapListener
 import io.nearpay.sdk.utils.listeners.PurchaseListener
 import java.io.OutputStream
 import java.net.Socket
@@ -47,16 +49,16 @@ import java.util.Locale
 import java.util.UUID
 
 
-class HomeFragment : BaseFragment(), MessageListener {
+class HomeFragment : BaseFragment(), MessageListener{
     private lateinit var mActivity: MainActivity
     private lateinit var tcpServer: TCPServer
     private lateinit var webSocketClient: WebSocketClient
     private lateinit var binding: FragmentHomeBinding
     private var outStream: OutputStream? = null
-    private lateinit var socket : Socket
+    private lateinit var socket: Socket
     private var adapter = ClientListAdapter()
-    private  var arrListClients = ArrayList<String>()
-    private lateinit var nearpay : NearPay
+    private var arrListClients = ArrayList<String>()
+    private lateinit var nearpay: NearPay
     private var clientModel = ClientDataModel()
     val gson = Gson()
 
@@ -81,12 +83,12 @@ class HomeFragment : BaseFragment(), MessageListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initializeSocket()
+        startServerService()
         initializeToolbar()
         initializeNearPay()
     }
 
-    private fun initializeToolbar(){
+    private fun initializeToolbar() {
         setUpToolbar(
             binding.layoutToolbar,
             title = getString(R.string.app_name),
@@ -94,7 +96,7 @@ class HomeFragment : BaseFragment(), MessageListener {
             navController = findNavController(),
             toolbarClickListener = object : CommonInterfaceClickEvent {
                 override fun onToolBarListener(type: String) {
-                    if (type == Constants.TOOLBAR_ICON_ONE){
+                    if (type == Constants.TOOLBAR_ICON_ONE) {
                         Dialogs.showPasswordDialog(
                             activity = mActivity,
                             alertDialogInterface = object : AlertDialogInterface {
@@ -109,6 +111,24 @@ class HomeFragment : BaseFragment(), MessageListener {
         )
     }
 
+    private fun startServerService(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                mActivity,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                0
+            )
+        }
+
+        Intent(mActivity.applicationContext, ServerService::class.java).also { intent ->
+            intent.action = ServerService.Actions.START.toString()
+            mActivity.startService(intent)
+            println("here is service started")
+            initializeSocket()
+        }
+
+    }
+
     private fun initializeSocket(){
         tcpServer = TCPServer(8085,this)
         Thread {
@@ -118,12 +138,6 @@ class HomeFragment : BaseFragment(), MessageListener {
         webSocketClient = WebSocketClient(8085)
         webSocketClient.start()
 
-        /* binding.btnSend.setOnClickListener {
-             val message = binding.edtMessage.text.toString().trim()
-             if (message.isNotEmpty()) {
-                 binding.edtMessage.text.clear()
-             }
-         }*/
     }
 
     private fun initializeNearPay(){
@@ -147,16 +161,11 @@ class HomeFragment : BaseFragment(), MessageListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        tcpServer.stop()
-        webSocketClient.stop()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(message: String) {
-        /*mActivity.runOnUiThread {
-            println("Received message in activity: $message")
-            callPurchase(message)
-        }*/
+
     }
 
     override fun onMessageJsonReceived(json: JsonObject) {
@@ -179,17 +188,12 @@ class HomeFragment : BaseFragment(), MessageListener {
                 val code = clientModel.code
                 val amount = clientModel.amount
 
-                if (mActivity.isCodeVerified()){
-                    if (code?.isEmpty() == true){
-                        arrListClients.forEach {
-                            val jsonObject = JsonObject()
-                            jsonObject.addProperty("message","success")
-                            sendMessageToWebSocketClient(it,jsonObject)
-                        }
+                if (mActivity.isCodeVerified()) {
+                    if (code?.isEmpty() == true) {
                         callPurchase(amount.asDouble())
                     }
-                }else {
-                    if (code == mActivity.getUserDataResponse()?.code){
+                } else {
+                    if (code == mActivity.getUserDataResponse()?.code) {
                         binding.root.showSnackBar("Client Connected")
                         mActivity.setUserDataResponse(
                             UserResponseModel(
@@ -199,17 +203,39 @@ class HomeFragment : BaseFragment(), MessageListener {
                                 )
                             )
                         )
-                    }else{
+                    } else {
                         socket.close()
                         binding.root.showSnackBar("Client Disconnected")
                     }
                 }
-            }else {
+            } else {
                 socket.close()
                 binding.root.showSnackBar("Client Disconnected")
             }
 
         }
+    }
+
+    override fun onClientConnected(clientSocket: Socket?, clientList: List<String>) {
+        Thread {
+            try {
+                outStream = clientSocket?.getOutputStream()
+                if (clientSocket != null) {
+                    socket = clientSocket
+                    mActivity.runOnUiThread {
+                        binding.root.showSnackBar("Client Connected")
+                        println("here is client list fahad ${clientList}")
+                        arrListClients.clear()
+                        arrListClients.addAll(clientList)
+                        println("here is client list fahad 111 ${arrListClients}")
+                    }
+                }
+                println("Connected to server")
+            } catch (e: Exception) {
+
+                e.printStackTrace()
+            }
+        }.start()
     }
 
     override fun onClientDisconnected() {
@@ -223,45 +249,33 @@ class HomeFragment : BaseFragment(), MessageListener {
         )
     }
 
-    override fun onClientConnected(clientSocket: Socket?) {
-        Thread {
-            try {
-                outStream = clientSocket?.getOutputStream()
-                if (clientSocket != null) {
-                    socket = clientSocket
-                    mActivity.runOnUiThread {
-                        tcpServer.observeClientList().observe(this) { clients ->
-                            binding.root.showSnackBar("Client Connected")
-                            arrListClients.addAll(clients)
 
-                        }
-                    }
-                }
-                println("Connected to server")
-            } catch (e: Exception) {
-
-                e.printStackTrace()
-            }
-        }.start()
-    }
-
-    private fun callPurchase(amount: Double){
+    private fun callPurchase(amount: Double) {
         println("here is client start 0000 ${arrListClients.size}")
 
         val customerReferenceNumber = "9ace70b7-977d-4094-b7f4-4ecb17de6753"
         val enableReceiptUi = true
         val enableReversal = true
-        val finishTimeOut : Long = 10
+        val finishTimeOut: Long = 10
         val requestId = UUID.randomUUID()
         val enableUiDismiss = true
         val nearpayAmount = (amount * 100).toLong()
 
-        nearpay.purchase(nearpayAmount, customerReferenceNumber, enableReceiptUi, enableReversal, finishTimeOut, requestId, enableUiDismiss, object :
-            PurchaseListener {
+        nearpay.purchase(
+            nearpayAmount,
+            customerReferenceNumber,
+            enableReceiptUi,
+            enableReversal,
+            finishTimeOut,
+            requestId,
+            enableUiDismiss,
+            object :
+                PurchaseListener {
 
             override fun onPurchaseApproved(transactionData: TransactionData) {
                 val jsonObject = JsonObject()
                 println("here is transaction data $transactionData")
+                println("here is arrListClients $arrListClients")
                 jsonObject.add("transactionData", gson.toJsonTree(transactionData))
                 arrListClients.forEach {
                     sendMessageToWebSocketClient(it, jsonObject)
@@ -269,69 +283,72 @@ class HomeFragment : BaseFragment(), MessageListener {
             }
 
 
-            override fun onPurchaseFailed(purchaseFailure: PurchaseFailure) {
-                when (purchaseFailure) {
-                    is PurchaseFailure.PurchaseDeclined -> {
-                        println("here is 1111")
-                        println("here is ${purchaseFailure.transactionData}")
-                        val jsonObject = JsonObject()
-                        jsonObject.add("transactionData", gson.toJsonTree(purchaseFailure.transactionData))
-                        arrListClients.forEach {
-                            sendMessageToWebSocketClient(it, jsonObject)
+                override fun onPurchaseFailed(purchaseFailure: PurchaseFailure) {
+                    when (purchaseFailure) {
+                        is PurchaseFailure.PurchaseDeclined -> {
+                            println("here is 1111")
+                            println("here is ${purchaseFailure.transactionData}")
+                            val jsonObject = JsonObject()
+                            jsonObject.add(
+                                "transactionData",
+                                gson.toJsonTree(purchaseFailure.transactionData)
+                            )
+                            arrListClients.forEach {
+                                sendMessageToWebSocketClient(it, jsonObject)
+                            }
+
                         }
 
-                    }
+                        is PurchaseFailure.PurchaseRejected -> {
 
-                    is PurchaseFailure.PurchaseRejected -> {
-
-                        println("here is 222")
-                        arrListClients.forEach {
-                            println("here is ${purchaseFailure.message}")
-                            val jsonObject = JsonObject()
-                            jsonObject.addProperty("status_message","failure")
-                            jsonObject.addProperty("description", purchaseFailure.message)
-                            println("here is purchase rejected")
-                            sendMessageToWebSocketClient(it,jsonObject)
+                            println("here is 222")
+                            arrListClients.forEach {
+                                println("here is ${purchaseFailure.message}")
+                                val jsonObject = JsonObject()
+                                jsonObject.addProperty("status_message", "failure")
+                                jsonObject.addProperty("description", purchaseFailure.message)
+                                println("here is purchase rejected")
+                                sendMessageToWebSocketClient(it, jsonObject)
+                            }
                         }
-                    }
 
-                    is PurchaseFailure.AuthenticationFailed -> {
-                        nearpay.updateAuthentication(AuthenticationData.Jwt("JWT HERE"))
-                        arrListClients.forEach {
-                            val jsonObject = JsonObject()
-                            jsonObject.addProperty("status_message","failure")
-                            println("here is purchase rejected ${jsonObject}")
-                            sendMessageToWebSocketClient(it,jsonObject)
+                        is PurchaseFailure.AuthenticationFailed -> {
+                            nearpay.updateAuthentication(AuthenticationData.Jwt("JWT HERE"))
+                            arrListClients.forEach {
+                                val jsonObject = JsonObject()
+                                jsonObject.addProperty("status_message", "failure")
+                                println("here is purchase rejected ${jsonObject}")
+                                sendMessageToWebSocketClient(it, jsonObject)
+                            }
                         }
-                    }
 
-                    is PurchaseFailure.InvalidStatus -> {
-                        println("here is 4444")
-                        arrListClients.forEach {
-                            val jsonObject = JsonObject()
-                            jsonObject.addProperty("status_message","failure")
-                            sendMessageToWebSocketClient(it,jsonObject)
+                        is PurchaseFailure.InvalidStatus -> {
+                            println("here is 4444")
+                            arrListClients.forEach {
+                                val jsonObject = JsonObject()
+                                jsonObject.addProperty("status_message", "failure")
+                                sendMessageToWebSocketClient(it, jsonObject)
+                            }
                         }
-                    }
 
-                    is PurchaseFailure.GeneralFailure -> {
-                        arrListClients.forEach {
-                            val jsonObject = JsonObject()
-                            jsonObject.addProperty("status_message","failure")
-                            sendMessageToWebSocketClient(it,jsonObject)
+                        is PurchaseFailure.GeneralFailure -> {
+                            arrListClients.forEach {
+                                val jsonObject = JsonObject()
+                                jsonObject.addProperty("status_message", "failure")
+                                sendMessageToWebSocketClient(it, jsonObject)
+                            }
                         }
-                    }
 
-                    is PurchaseFailure.UserCancelled -> {
-                        arrListClients.forEach {
-                            val jsonObject = JsonObject()
-                            jsonObject.addProperty("status_message","failure")
-                            sendMessageToWebSocketClient(it,jsonObject)
+                        is PurchaseFailure.UserCancelled -> {
+                            arrListClients.forEach {
+                                val jsonObject = JsonObject()
+                                jsonObject.addProperty("status_message", "failure")
+                                sendMessageToWebSocketClient(it, jsonObject)
+                            }
                         }
                     }
                 }
-            }
-        })
+            })
 
     }
 

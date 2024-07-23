@@ -167,5 +167,12 @@
     <string name="label_enter_pin">Enter Pin</string>
     <string name="label_generate">Generate</string>
     <string name="label_regenerate">Regenerate</string>
+    <string name="type">Type</string>
+    <string name="count">Count</string>
+    <string name="purchase">Purchase</string>
+    <string name="refund">Refund</string>
+    <string name="purchase_reversal">Purchase Reversal</string>
+    <string name="refund_reversal">Refund Reversal</string>
+    <string name="total">Total</string>
 
 </resources>

@@ -8,8 +8,12 @@ import android.graphics.*
 import android.text.SpannableString
 import android.util.*
 import android.view.*
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import coil.load
+import coil.request.ErrorResult
+import coil.request.ImageRequest
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.orbits.paymentapp.R
@@ -91,6 +95,25 @@ object Global {
             Constants.fontMedium -> context.resources.getFont(R.font.font_medium)
             Constants.fontRegularRev -> context.resources.getFont(R.font.font_regular_rev)
             else -> context.resources.getFont(R.font.font_regular)
+        }
+    }
+
+    fun ImageView.loadImagesUsingCoil(
+        strUrl: String?,
+        errorImage: Int? = null,
+    ) {
+        this.load(strUrl) {
+            crossfade(true)
+            if (errorImage != null) {
+                error(errorImage)
+            }
+            allowConversionToBitmap(true)
+            bitmapConfig(Bitmap.Config.ARGB_8888)
+            allowHardware(true)
+            listener(object : ImageRequest.Listener {
+                override fun onError(request: ImageRequest, result: ErrorResult) {
+                }
+            })
         }
     }
 
