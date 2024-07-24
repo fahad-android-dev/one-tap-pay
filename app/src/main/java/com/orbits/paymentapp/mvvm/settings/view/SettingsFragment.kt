@@ -75,7 +75,7 @@ class SettingsFragment : BaseFragment() {
         }
 
         binding.txtChangePassword.setOnClickListener {
-            Dialogs.showChangePasswordDialog(
+            Dialogs.showChangeAllPasswordDialog(
                 activity = mActivity,
                 alertDialogInterface = object : AlertDialogInterface{
                     override fun onSubmitPasswordClick(password: String) {

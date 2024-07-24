@@ -12,22 +12,19 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.orbits.paymentapp.R
 import com.orbits.paymentapp.databinding.LayoutChangePasswordDialogBinding
+import com.orbits.paymentapp.databinding.LayoutChangePasswordNewDialogBinding
 import com.orbits.paymentapp.databinding.LayoutCustomAlertBinding
 import com.orbits.paymentapp.databinding.LayoutGenerateCodeDialogBinding
 import com.orbits.paymentapp.databinding.LayoutSettingsPasswordDialogBinding
 import com.orbits.paymentapp.helper.Global.getDimension
-import com.orbits.paymentapp.helper.PrefUtils.getAppConfig
 import com.orbits.paymentapp.helper.PrefUtils.getAppPassword
 import com.orbits.paymentapp.helper.PrefUtils.getMasterKey
-import com.orbits.paymentapp.helper.PrefUtils.setAppConfig
-import com.orbits.paymentapp.helper.PrefUtils.setAppPassword
-import com.orbits.paymentapp.helper.helper_model.AppConfigModel
-import com.orbits.paymentapp.helper.helper_model.PasswordModel
 
 object Dialogs {
 
     var customDialog: Dialog? = null
     var codeDialog: Dialog? = null
+    var changeAllPasswordDialog: Dialog? = null
     var changePasswordDialog: Dialog? = null
 
     fun showPasswordDialog(
@@ -145,6 +142,49 @@ object Dialogs {
         }
     }
 
+    fun showChangeAllPasswordDialog(
+        activity: Context,
+        alertDialogInterface: AlertDialogInterface,
+    ) {
+        try {
+            changeAllPasswordDialog = Dialog(activity)
+            changeAllPasswordDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            changeAllPasswordDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            val binding: LayoutChangePasswordDialogBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(activity),
+                R.layout.layout_change_password_dialog, null, false
+            )
+            changeAllPasswordDialog?.setContentView(binding.root)
+            val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
+            lp.copyFrom(changeAllPasswordDialog?.window?.attributes)
+            lp.width = getDimension(activity as Activity, 300.00)
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+            lp.gravity = Gravity.CENTER
+            changeAllPasswordDialog?.window?.attributes = lp
+            changeAllPasswordDialog?.setCanceledOnTouchOutside(true)
+            changeAllPasswordDialog?.setCancelable(true)
+
+
+            binding.ivCancel.setOnClickListener {
+                changeAllPasswordDialog?.dismiss()
+            }
+
+            binding.btnAlertPositive.setOnClickListener {
+                if(binding.edtNewPassword.text.toString() != binding.edtConfirmPassword.text.toString()){
+                    Toast.makeText(activity,"Both Passwords don't match", Toast.LENGTH_SHORT).show()
+                }else if (binding.edtOldPassword.text.toString() != activity.getAppPassword()?.appPassword){
+                    Toast.makeText(activity,"Old Password is not correct", Toast.LENGTH_SHORT).show()
+                }else {
+                    changeAllPasswordDialog?.dismiss()
+                    alertDialogInterface.onSubmitPasswordClick(binding.edtConfirmPassword.text.toString())
+                }
+            }
+            changeAllPasswordDialog?.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     fun showChangePasswordDialog(
         activity: Context,
         alertDialogInterface: AlertDialogInterface,
@@ -153,9 +193,9 @@ object Dialogs {
             changePasswordDialog = Dialog(activity)
             changePasswordDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
             changePasswordDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            val binding: LayoutChangePasswordDialogBinding = DataBindingUtil.inflate(
+            val binding: LayoutChangePasswordNewDialogBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(activity),
-                R.layout.layout_change_password_dialog, null, false
+                R.layout.layout_change_password_new_dialog, null, false
             )
             changePasswordDialog?.setContentView(binding.root)
             val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
@@ -168,19 +208,16 @@ object Dialogs {
             changePasswordDialog?.setCancelable(true)
 
 
-            binding.edtOldPassword.setText(activity.getAppPassword()?.appPassword)
-
-
             binding.ivCancel.setOnClickListener {
                 changePasswordDialog?.dismiss()
             }
 
             binding.btnAlertPositive.setOnClickListener {
-                if (binding.edtNewPassword.text.toString() != binding.edtConfirmPassword.text.toString()){
-                    Toast.makeText(activity,"Both Passwords don't match", Toast.LENGTH_SHORT).show()
+                if (binding.edtNewPassword.text.toString().isEmpty()){
+                    Toast.makeText(activity,"Please enter password", Toast.LENGTH_SHORT).show()
                 }else {
                     changePasswordDialog?.dismiss()
-                    alertDialogInterface.onSubmitPasswordClick(binding.edtConfirmPassword.text.toString())
+                    alertDialogInterface.onSubmitPasswordClick(binding.edtNewPassword.text.toString())
                 }
             }
             changePasswordDialog?.show()

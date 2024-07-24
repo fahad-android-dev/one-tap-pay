@@ -141,6 +141,20 @@ class HomeFragment : BaseFragment(), MessageListener{
                                             masterKey = code
                                         )
                                     )
+                                    Dialogs.showChangePasswordDialog(
+                                        activity = mActivity,
+                                        alertDialogInterface = object : AlertDialogInterface {
+                                            override fun onSubmitPasswordClick(password: String) {
+                                                mActivity.setAppPassword(
+                                                    result = PasswordModel(
+                                                        appPassword = password
+                                                    )
+                                                )
+                                                findNavController().navigate(R.id.action_to_navigation_settings)
+                                            }
+
+                                        }
+                                    )
                                 }
                             }
                         )
@@ -151,7 +165,7 @@ class HomeFragment : BaseFragment(), MessageListener{
     }
 
     private fun startServerService(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             ActivityCompat.requestPermissions(
                 mActivity,
                 arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
