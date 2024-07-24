@@ -1,7 +1,6 @@
 package com.orbits.paymentapp.mvvm.settings.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +10,12 @@ import com.orbits.paymentapp.R
 import com.orbits.paymentapp.databinding.FragmentSettingsBinding
 import com.orbits.paymentapp.helper.AlertDialogInterface
 import com.orbits.paymentapp.helper.BaseFragment
-import com.orbits.paymentapp.helper.Constants
 import com.orbits.paymentapp.helper.Dialogs
+import com.orbits.paymentapp.helper.PrefUtils.getMasterKey
 import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
+import com.orbits.paymentapp.helper.PrefUtils.setAppPassword
 import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
+import com.orbits.paymentapp.helper.helper_model.PasswordModel
 import com.orbits.paymentapp.helper.helper_model.UserDataModel
 import com.orbits.paymentapp.helper.helper_model.UserResponseModel
 import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
@@ -71,6 +72,22 @@ class SettingsFragment : BaseFragment() {
 
         binding.txtReconcile.setOnClickListener {
             navigateToReconcileFragment()
+        }
+
+        binding.txtChangePassword.setOnClickListener {
+            Dialogs.showChangePasswordDialog(
+                activity = mActivity,
+                alertDialogInterface = object : AlertDialogInterface{
+                    override fun onSubmitPasswordClick(password: String) {
+                        println("here is 222 ${mActivity.getMasterKey()?.masterKey}")
+                        mActivity.setAppPassword(
+                            result = PasswordModel(
+                                appPassword = password
+                            )
+                        )
+                    }
+                }
+            )
         }
     }
 

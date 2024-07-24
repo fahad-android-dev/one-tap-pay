@@ -174,5 +174,12 @@
     <string name="purchase_reversal">Purchase Reversal</string>
     <string name="refund_reversal">Refund Reversal</string>
     <string name="total">Total</string>
+    <string name="enter_password">Enter password</string>
+    <string name="change_password">Change Password</string>
+    <string name="reconcile">Reconcile</string>
+    <string name="pairing_code">Pairing Code</string>
+    <string name="enter_old_password">Enter old password</string>
+    <string name="enter_new_password">enter new password</string>
+    <string name="confirm_new_password">Confirm new password</string>
 
 </resources>

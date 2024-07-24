@@ -3,8 +3,6 @@ package com.orbits.paymentapp.mvvm.main.view
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,13 +19,22 @@ import com.orbits.paymentapp.helper.BaseFragment
 import com.orbits.paymentapp.helper.Constants
 import com.orbits.paymentapp.helper.Dialogs
 import com.orbits.paymentapp.helper.Extensions.asDouble
+import com.orbits.paymentapp.helper.Global
 import com.orbits.paymentapp.helper.Global.showSnackBar
+import com.orbits.paymentapp.helper.PrefUtils.getAppPassword
+import com.orbits.paymentapp.helper.PrefUtils.getMasterKey
 import com.orbits.paymentapp.helper.PrefUtils.getUserDataResponse
 import com.orbits.paymentapp.helper.PrefUtils.isCodeVerified
+import com.orbits.paymentapp.helper.PrefUtils.setAppConfig
+import com.orbits.paymentapp.helper.PrefUtils.setAppPassword
+import com.orbits.paymentapp.helper.PrefUtils.setMasterKey
 import com.orbits.paymentapp.helper.PrefUtils.setUserDataResponse
 import com.orbits.paymentapp.helper.ServerService
 import com.orbits.paymentapp.helper.TCPServer
 import com.orbits.paymentapp.helper.WebSocketClient
+import com.orbits.paymentapp.helper.helper_model.AppConfigModel
+import com.orbits.paymentapp.helper.helper_model.AppMasterKeyModel
+import com.orbits.paymentapp.helper.helper_model.PasswordModel
 import com.orbits.paymentapp.helper.helper_model.UserDataModel
 import com.orbits.paymentapp.helper.helper_model.UserResponseModel
 import com.orbits.paymentapp.interfaces.CommonInterfaceClickEvent
@@ -83,6 +90,24 @@ class HomeFragment : BaseFragment(), MessageListener{
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        println("here is 111 ${mActivity.getMasterKey()?.masterKey}")
+        if (mActivity.getMasterKey()?.masterKey == null){
+            Global.getRandomDeviceId()
+            mActivity.setMasterKey(
+                result = AppMasterKeyModel(
+                    masterKey = Global.getRandomDeviceId()
+                )
+            )
+
+        }
+        if (mActivity.getAppPassword()?.appPassword == null){
+            mActivity.setAppPassword(
+                result = PasswordModel(
+                    appPassword = "1234"
+                )
+            )
+        }
+
         startServerService()
         initializeToolbar()
         initializeNearPay()
@@ -97,11 +122,25 @@ class HomeFragment : BaseFragment(), MessageListener{
             toolbarClickListener = object : CommonInterfaceClickEvent {
                 override fun onToolBarListener(type: String) {
                     if (type == Constants.TOOLBAR_ICON_ONE) {
+                        val appSalt = byteArrayOf(17, 43, 99, 82, 55, 28, 40, 90)
+                        val masterPassword =  Global.getMasterKey(mActivity,appSalt)
+
+                        println("here is master password $masterPassword")
+
                         Dialogs.showPasswordDialog(
                             activity = mActivity,
                             alertDialogInterface = object : AlertDialogInterface {
                                 override fun onYesClick() {
-                                    findNavController().navigate(R.id.action_to_navigation_settings)
+                                  findNavController().navigate(R.id.action_to_navigation_settings)
+                                }
+
+                                override fun onMasterYesClick() {
+                                    val code = Global.getRandomDeviceId()
+                                    mActivity.setMasterKey(
+                                        result = AppMasterKeyModel(
+                                            masterKey = code
+                                        )
+                                    )
                                 }
                             }
                         )

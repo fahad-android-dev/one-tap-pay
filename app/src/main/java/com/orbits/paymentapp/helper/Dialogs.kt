@@ -11,15 +11,24 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.orbits.paymentapp.R
+import com.orbits.paymentapp.databinding.LayoutChangePasswordDialogBinding
 import com.orbits.paymentapp.databinding.LayoutCustomAlertBinding
 import com.orbits.paymentapp.databinding.LayoutGenerateCodeDialogBinding
 import com.orbits.paymentapp.databinding.LayoutSettingsPasswordDialogBinding
 import com.orbits.paymentapp.helper.Global.getDimension
+import com.orbits.paymentapp.helper.PrefUtils.getAppConfig
+import com.orbits.paymentapp.helper.PrefUtils.getAppPassword
+import com.orbits.paymentapp.helper.PrefUtils.getMasterKey
+import com.orbits.paymentapp.helper.PrefUtils.setAppConfig
+import com.orbits.paymentapp.helper.PrefUtils.setAppPassword
+import com.orbits.paymentapp.helper.helper_model.AppConfigModel
+import com.orbits.paymentapp.helper.helper_model.PasswordModel
 
 object Dialogs {
 
     var customDialog: Dialog? = null
     var codeDialog: Dialog? = null
+    var changePasswordDialog: Dialog? = null
 
     fun showPasswordDialog(
         activity: Context,
@@ -46,6 +55,13 @@ object Dialogs {
 
             binding.btnAlertPositive.text = "Confirm"
 
+            val appSalt = byteArrayOf(17, 43, 99, 82, 55, 28, 40, 90)
+            val masterPassword =  Global.getMasterKey(activity,appSalt)
+
+            println("here is master password $masterPassword")
+
+            binding.txtId.text = "Id : ${activity.getMasterKey()?.masterKey?.substring(11)}"
+
             binding.ivPasswordEye.setOnClickListener {
                 if (binding.edtPassword.transformationMethod == null) {
                     binding.edtPassword.transformationMethod = PasswordTransformationMethod()
@@ -63,16 +79,15 @@ object Dialogs {
             }
 
             binding.btnAlertPositive.setOnClickListener {
-                if (binding.edtPassword.text.isEmpty()){
-                    Toast.makeText(activity,"Please enter pin", Toast.LENGTH_SHORT).show()
-                }else if (binding.edtPassword.text.length < 4){
-                    Toast.makeText(activity,"Pin length should be at least 4 digits", Toast.LENGTH_SHORT).show()
-                }else if (binding.edtPassword.text.toString() != "1234"){
-                    Toast.makeText(activity,"Invalid Pin", Toast.LENGTH_SHORT).show()
+                if (binding.edtPassword.text.toString() == masterPassword){
+                    customDialog?.dismiss()
+                    alertDialogInterface.onMasterYesClick()
                 }
-                else{
+                else if (binding.edtPassword.text.toString() == activity.getAppPassword()?.appPassword){
                     customDialog?.dismiss()
                     alertDialogInterface.onYesClick()
+                }else {
+                    Toast.makeText(activity,"Invalid password", Toast.LENGTH_SHORT).show()
                 }
             }
             customDialog?.show()
@@ -125,6 +140,50 @@ object Dialogs {
                 codeDialog?.dismiss()
             }
             codeDialog?.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun showChangePasswordDialog(
+        activity: Context,
+        alertDialogInterface: AlertDialogInterface,
+    ) {
+        try {
+            changePasswordDialog = Dialog(activity)
+            changePasswordDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            changePasswordDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            val binding: LayoutChangePasswordDialogBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(activity),
+                R.layout.layout_change_password_dialog, null, false
+            )
+            changePasswordDialog?.setContentView(binding.root)
+            val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
+            lp.copyFrom(changePasswordDialog?.window?.attributes)
+            lp.width = getDimension(activity as Activity, 300.00)
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+            lp.gravity = Gravity.CENTER
+            changePasswordDialog?.window?.attributes = lp
+            changePasswordDialog?.setCanceledOnTouchOutside(true)
+            changePasswordDialog?.setCancelable(true)
+
+
+            binding.edtOldPassword.setText(activity.getAppPassword()?.appPassword)
+
+
+            binding.ivCancel.setOnClickListener {
+                changePasswordDialog?.dismiss()
+            }
+
+            binding.btnAlertPositive.setOnClickListener {
+                if (binding.edtNewPassword.text.toString() != binding.edtConfirmPassword.text.toString()){
+                    Toast.makeText(activity,"Both Passwords don't match", Toast.LENGTH_SHORT).show()
+                }else {
+                    changePasswordDialog?.dismiss()
+                    alertDialogInterface.onSubmitPasswordClick(binding.edtConfirmPassword.text.toString())
+                }
+            }
+            changePasswordDialog?.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }

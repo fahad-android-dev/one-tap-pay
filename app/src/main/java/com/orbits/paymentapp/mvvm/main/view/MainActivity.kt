@@ -16,6 +16,11 @@ import com.orbits.paymentapp.R
 import com.orbits.paymentapp.databinding.ActivityMainBinding
 import com.orbits.paymentapp.helper.AppController
 import com.orbits.paymentapp.helper.BaseActivity
+import com.orbits.paymentapp.helper.Global
+import com.orbits.paymentapp.helper.PrefUtils.setAppConfig
+import com.orbits.paymentapp.helper.PrefUtils.setMasterKey
+import com.orbits.paymentapp.helper.helper_model.AppConfigModel
+import com.orbits.paymentapp.helper.helper_model.AppMasterKeyModel
 import com.orbits.paymentapp.interfaces.MessageListener
 
 class MainActivity : BaseActivity(){
@@ -32,6 +37,7 @@ class MainActivity : BaseActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
         initBottomTabs()
         initLeftNavMenuDrawer()
         initializeFields()
