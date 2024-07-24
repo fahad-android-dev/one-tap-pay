@@ -164,6 +164,24 @@ object Dialogs {
             changeAllPasswordDialog?.setCanceledOnTouchOutside(true)
             changeAllPasswordDialog?.setCancelable(true)
 
+            binding.ivOldPasswordEye.setOnClickListener {
+                Extensions.showPassword(
+                    activity,binding.edtOldPassword, imageView = binding.ivOldPasswordEye
+                )
+            }
+
+            binding.ivNewPasswordEye.setOnClickListener {
+                Extensions.showPassword(
+                    activity,binding.edtNewPassword, imageView = binding.ivNewPasswordEye
+                )
+            }
+
+            binding.ivConfirmPasswordEye.setOnClickListener {
+                Extensions.showPassword(
+                    activity,binding.edtConfirmPassword, imageView = binding.ivConfirmPasswordEye
+                )
+            }
+
 
             binding.ivCancel.setOnClickListener {
                 changeAllPasswordDialog?.dismiss()
