@@ -55,7 +55,7 @@
                         android:layout_marginTop="@dimen/_25sdp"
                         android:textSize="@dimen/biggest_text_size"
                         android:layout_marginHorizontal="@dimen/screen_margin"
-                        android:text="Pairing Code"
+                        android:text="@string/pairing_code"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -95,7 +95,7 @@
                             android:layout_gravity="center"
                             android:layout_marginStart="0dp"
                             android:textSize="@dimen/btn_text_size"
-                            android:text="Generate"
+                            android:text="@string/generate"
                             android:includeFontPadding="false"
                             android:layout_marginEnd="@dimen/_3sdp"
                             android:layout_height="@dimen/_30sdp" />

@@ -39,16 +39,12 @@ class MainActivity : BaseActivity(){
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         initBottomTabs()
-        initLeftNavMenuDrawer()
         initializeFields()
         initializeToolbar()
         onClickListeners()
     }
 
-    private fun initLeftNavMenuDrawer() {
-        binding.navigationView.setupWithNavController(navController)
 
-    }
 
     private fun initBottomTabs() {
         onBottomNavigationItemClickListener()

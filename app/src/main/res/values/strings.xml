@@ -181,5 +181,13 @@
     <string name="enter_old_password">Enter old password</string>
     <string name="enter_new_password">enter new password</string>
     <string name="confirm_new_password">Confirm new password</string>
+    <string name="change_language">Change Language</string>
+    <string name="confirm">Confirm</string>
+    <string name="generate">Generate</string>
+    <string name="enter_pin_to_continue">Enter pin to continue</string>
+    <string name="settings">Settings</string>
+    <string name="are_you_sure_you_want_to_generate_a_new_code">Are you sure you want to generate a new code?</string>
+    <string name="yes">Yes</string>
+    <string name="label_no">No</string>
 
 </resources>
